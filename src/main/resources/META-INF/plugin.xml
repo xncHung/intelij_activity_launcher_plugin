@@ -1,0 +1,32 @@
+<idea-plugin>
+    <id>cn.xnd.plugins.androidActLauncher</id>
+    <name>ActivityLauncher</name>
+    <vendor email="xjpnull@gmail.com">xnd</vendor>
+
+    <description><![CDATA[
+    Enter short description for your plugin here.<br>
+    <em>most HTML tags may be used</em>
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="ActivityLauncher"
+                    anchor="right"
+                    secondary="true"
+                    factoryClass="cn.xjp.plugins.android_act_launcher.ActivityLauncher"
+        >
+
+
+        </toolWindow>
+
+        <!-- Add your extensions here -->
+    </extensions>
+    <idea-version since-build="173"/>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.android</depends>
+</idea-plugin>
