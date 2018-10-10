@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.xjp.plugins.android_act_launcher.AddNewRuleDialog">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.xjp.plugins.android_act_launcher.rule.AddNewRuleDialog">
   <grid id="27dc6" binding="rootContent" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
@@ -127,9 +127,11 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="145c9" class="javax.swing.JList" binding="paramsList">
+          <component id="a98ba" class="javax.swing.JTable" binding="paramTable">
             <constraints/>
-            <properties/>
+            <properties>
+              <updateSelectionOnSort value="true"/>
+            </properties>
           </component>
         </children>
       </scrollpane>

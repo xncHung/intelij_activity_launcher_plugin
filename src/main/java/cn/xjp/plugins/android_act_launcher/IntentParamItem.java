@@ -1,15 +1,13 @@
 package cn.xjp.plugins.android_act_launcher;
 
-import android.os.Parcelable;
-import cn.xjp.plugins.android_act_launcher.bean.IntentParam;
+import cn.xjp.plugins.android_act_launcher.rule.IntentParam;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Type;
 
 public class IntentParamItem {
     private JTextField tfKey;
-    private JComboBox<Type> cbbType;
+    private JComboBox<String> cbbType;
     private JTextField tfValue;
     private JCheckBox cbActive;
     private JPanel itemContent;
@@ -17,8 +15,19 @@ public class IntentParamItem {
 
     public Component render(IntentParam value) {
         tfKey.setText("Key");
-        tfValue.setText("value,use json to present a object");
-        cbbType.setModel(new );
-//        return null;
+        tfValue.setText("value,use json to represent a object");
+        cbbType.setModel(new DefaultComboBoxModel<>(TYPES));
+//        cbbType.setRenderer(new ListCellRendererWrapper<String>() {
+//            @Override
+//            public void customize(JList jList, String s, int i, boolean b, boolean b1) {
+//
+//            }
+//
+//            @Override
+//            public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+//                return null;
+//            }
+//        });
+        return itemContent;
     }
 }

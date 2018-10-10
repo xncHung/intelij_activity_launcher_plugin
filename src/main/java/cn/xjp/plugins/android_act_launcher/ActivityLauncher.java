@@ -1,6 +1,7 @@
 package cn.xjp.plugins.android_act_launcher;
 
 import cn.xjp.plugins.android_act_launcher.adb.Bridge;
+import cn.xjp.plugins.android_act_launcher.rule.AddNewRuleDialog;
 import com.android.builder.model.AndroidProject;
 import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
