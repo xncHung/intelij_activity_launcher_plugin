@@ -15,6 +15,7 @@ class ParamItemModel extends DefaultTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex==2)return Array.class;
+        if (getValueAt(0,columnIndex)==null)return Object.class;
         return getValueAt(0,columnIndex).getClass();
     }
 
