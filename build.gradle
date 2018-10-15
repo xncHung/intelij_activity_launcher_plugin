@@ -25,6 +25,7 @@ intellij {
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'androidActivityLauncher'
     plugins 'android'
+    systemProperty 'idea.is.internal', 'false'
 }
 patchPluginXml {
     changeNotes """

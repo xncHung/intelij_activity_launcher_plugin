@@ -26,7 +26,37 @@
 
         <!-- Add your extensions here -->
     </extensions>
+
     <idea-version since-build="173"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.android</depends>
+    <actions>
+        <group id="ActivityLauncher.Run.ToolBar"
+               class="com.intellij.openapi.actionSystem.DefaultActionGroup">
+            <action id="ActivityLauncher.StartAction"
+                    icon="/icons/run.png"
+                    class="cn.xjp.plugins.android_act_launcher.actions.StartAction"
+                    text="StartActivity"/>
+            <action id="ActivityLauncher.DebugAction"
+                    icon="/icons/debug.png"
+                    class="cn.xjp.plugins.android_act_launcher.actions.DebugAction"
+                    text="DebugActivity"/>
+        </group>
+        <group id="ActivityLauncher.Rule.ToolBar"
+               class="com.intellij.openapi.actionSystem.DefaultActionGroup">
+            <action id="ActivityLauncher.ACTIONS.AddNewRuleAction"
+                    icon="/icons/add.svg"
+                    class="cn.xjp.plugins.android_act_launcher.actions.AddNewRuleAction" text="AddNewRule"/>
+            <action id="ActivityLauncher.ACTIONS.RemoveRuleAction"
+                    icon="/icons/remove.svg"
+                    class="cn.xjp.plugins.android_act_launcher.actions.RemoveRuleAction" text="RemoveRule"/>
+            <action id="ActivityLauncher.ACTIONS.EditRuleAction"
+                    icon="/icons/edit.svg"
+                    class="cn.xjp.plugins.android_act_launcher.actions.EditRuleAction" text="EditRule"/>
+            <action id="ActivityLauncher.ACTIONS.ReLoadAction"
+                    icon="/icons/refresh.svg"
+                    class="cn.xjp.plugins.android_act_launcher.actions.ReLoadAction" text="Reload"/>
+        </group>
+
+    </actions>
 </idea-plugin>

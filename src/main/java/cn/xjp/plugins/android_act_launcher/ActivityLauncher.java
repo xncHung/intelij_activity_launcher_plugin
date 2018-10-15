@@ -1,60 +1,63 @@
 package cn.xjp.plugins.android_act_launcher;
 
 import cn.xjp.plugins.android_act_launcher.adb.Bridge;
-import cn.xjp.plugins.android_act_launcher.rule.AddNewRuleDialog;
+import cn.xjp.plugins.android_act_launcher.bean.Rule;
+import cn.xjp.plugins.android_act_launcher.rule.AddOrModifyRuleDialog;
+import cn.xjp.plugins.android_act_launcher.run.LaunchActivityCommand;
 import com.android.builder.model.AndroidProject;
 import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
 import com.android.tools.idea.gradle.project.sync.GradleSyncListener;
 import com.android.tools.idea.gradle.project.sync.GradleSyncState;
-import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
+public class ActivityLauncher extends JPanel implements ToolWindowFactory, GradleSyncListener {
 
-    private final Logger logger;
+    public static final String ID = "ActivityLauncher";
     private JPanel launcherWindowContent;
     private JComboBox<IDevice> devicesBox;
     private JComboBox<Module> moduleBox;
     private JComboBox<String> variantBox;
-    private JList<String> rulesList;
-    private JCheckBox reassembleCheckBox;
-    private JLabel addNewRule;
-    private JLabel removeRule;
-    private JLabel debug;
-    private JLabel run;
-    private JLabel refresh;
-    private JPanel start;
-    private JLabel editRule;
+    private JList<Rule> rulesList;
+    private JPanel runActionContainer;
+    private JPanel ruleActionContainer;
+    private JLabel errorTip;
+    private JCheckBox cbStopApp;
     private ToolWindow toolWindow;
     private ModuleManager moduleManager;
-    private DefaultListModel<String> listModel;
+    private DefaultListModel<Rule> listModel;
 
 
     public ActivityLauncher() {
-        logger = Logger.getInstance(ActivityLauncher.class);
+        super(new BorderLayout());
     }
+
 
     // Create the tool window content.
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         this.toolWindow = toolWindow;
         moduleManager = ModuleManager.getInstance(project);
+        add(launcherWindowContent, BorderLayout.CENTER);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(launcherWindowContent, "", false);
+        Content content = contentFactory.createContent(this, "", false);
         toolWindow.getContentManager().addContent(content);
 //        new FocusWatcher() {
 //            @Override
@@ -66,23 +69,41 @@ public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
 //
 //            }
 //        }.install(toolWindow.getComponent());
-
+        errorTip.setForeground(JBColor.RED);
         initDeviceBox(project, toolWindow);
         initModuleBox(project, toolWindow);
         initVariantBox(project, toolWindow);
         initRouterList();
 
         initListeners(project);
-        addNewRule.setIcon(AllIcons.General.Add);
-        removeRule.setIcon(AllIcons.General.Remove);
-        editRule.setIcon(AllIcons.Actions.Edit);
-        refresh.setIcon(AllIcons.Actions.Refresh);
-        debug.setIcon(AllIcons.Actions.StartDebugger);
-        run.setIcon(AllIcons.Actions.Execute);
 
+        initRuleActionBar();
+        initRunActionBar();
 
         GradleSyncState.subscribe(project, this);
         refreshData(project);
+    }
+
+    private void initRunActionBar() {
+        DefaultActionGroup group = (DefaultActionGroup) ActionManager.getInstance().getAction("ActivityLauncher.Run.ToolBar");
+        final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
+        actionToolbar.setTargetComponent(runActionContainer);
+        actionToolbar.setLayoutPolicy(ActionToolbar.WRAP_LAYOUT_POLICY);
+        JComponent component = actionToolbar.getComponent();
+        FlowLayout flowLayout = new FlowLayout(FlowLayout.LEFT);
+        flowLayout.setHgap(5);
+        runActionContainer.add(component, flowLayout);
+    }
+
+    private void initRuleActionBar() {
+        DefaultActionGroup group = (DefaultActionGroup) ActionManager.getInstance().getAction("ActivityLauncher.Rule.ToolBar");
+        final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
+        actionToolbar.setTargetComponent(ruleActionContainer);
+        actionToolbar.setLayoutPolicy(ActionToolbar.WRAP_LAYOUT_POLICY);
+        JComponent component = actionToolbar.getComponent();
+        FlowLayout flowLayout = new FlowLayout(FlowLayout.LEFT);
+        flowLayout.setHgap(5);
+        ruleActionContainer.add(component, flowLayout);
     }
 
     private void initRouterList() {
@@ -91,9 +112,13 @@ public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
         rulesList.setVisibleRowCount(-1);
         listModel = new DefaultListModel<>();
         rulesList.setModel(listModel);
-        listModel.addElement("GuideActivity1");
-        listModel.addElement("GuideActivity2");
-        listModel.addElement("GuideActivity3");
+        rulesList.setCellRenderer(new ListCellRendererWrapper<Rule>() {
+            @Override
+            public void customize(JList jList, Rule rule, int i, boolean b, boolean b1) {
+                setText(rule.toString());
+            }
+
+        });
     }
 
     private void initVariantBox(Project project, ToolWindow toolWindow) {
@@ -117,27 +142,15 @@ public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
                 }
             }
         });
-
-
-        refresh.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                refreshData(project);
-            }
-        });
-
-
-        addNewRule.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                openAddRuleDialog();
-            }
-        });
     }
 
-    private void openAddRuleDialog() {
-        AddNewRuleDialog addNewRuleDialog = new AddNewRuleDialog();
-        addNewRuleDialog.setSize(600, 360);
+    public void openAddRuleDialog() {
+        openRuleDialog(null);
+    }
+
+    private void openRuleDialog(Rule selectedValue) {
+        AddOrModifyRuleDialog addNewRuleDialog = new AddOrModifyRuleDialog(this, selectedValue);
+        addNewRuleDialog.setSize(1000, 500);
         addNewRuleDialog.setLocationRelativeTo(null);
         addNewRuleDialog.setResizable(false);
         addNewRuleDialog.setVisible(true);
@@ -155,7 +168,7 @@ public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
         }
     }
 
-    private void refreshData(@NotNull Project project) {
+    public void refreshData(@NotNull Project project) {
         IDevice[] deviceList = Bridge.getDeviceList(project);
         devicesBox.setModel(new DefaultComboBoxModel<>(deviceList));
 
@@ -211,17 +224,73 @@ public class ActivityLauncher implements ToolWindowFactory, GradleSyncListener {
 
     @Override
     public void syncSucceeded(@NotNull Project project) {
-        logger.info("syncSucceeded");
         refreshData(project);
     }
 
     @Override
     public void syncFailed(@NotNull Project project, @NotNull String s) {
-        logger.info("syncFailed");
     }
 
     @Override
     public void syncSkipped(@NotNull Project project) {
 
+    }
+
+    public void addRule(Rule rule) {
+        listModel.add(0, rule);
+    }
+
+    public void refreshRules() {
+        rulesList.updateUI();
+    }
+
+    public void removeRule() {
+        int selectedValue = rulesList.getSelectedIndex();
+        if (selectedValue >= 0) {
+            listModel.remove(selectedValue);
+        }
+    }
+
+    public void openEditRuleDialog() {
+        Rule selectedValue = rulesList.getSelectedValue();
+        if (selectedValue == null) {
+            return;
+        }
+        openRuleDialog(selectedValue);
+    }
+
+    public void submitRun(Project project, boolean debug) {
+        Object selectedItem = devicesBox.getSelectedItem();
+        if (!(selectedItem instanceof IDevice)) {
+            showError("no Device selected!");
+            return;
+        }
+        Object boxSelectedItem = moduleBox.getSelectedItem();
+        if (!(boxSelectedItem instanceof Module)) {
+            showError("no Module selected!");
+            return;
+        }
+        Rule selectedRule = getSelectedRule();
+        if (selectedRule == null) {
+            showError("select a target to launch");
+        }
+        IDevice device = (IDevice) selectedItem;
+        Module module = (Module) boxSelectedItem;
+
+        new LaunchActivityCommand(selectedRule, debug, cbStopApp.isSelected()).apply(project, device, module);
+    }
+
+    private void showError(String msg) {
+        errorTip.setText(msg);
+        new Timer(2000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                errorTip.setText("");
+            }
+        }).start();
+    }
+
+    public Rule getSelectedRule() {
+        return rulesList.getSelectedValue();
     }
 }
