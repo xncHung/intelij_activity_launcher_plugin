@@ -103,7 +103,7 @@ public class AddOrModifyRuleDialog extends JFrame {
                 activityLauncher.addRule(rule);
             } else {
                 rule.inject(selectedRule);
-                activityLauncher.refreshRules();
+                activityLauncher.refreshRules(selectedRule);
             }
             dispose();
         }

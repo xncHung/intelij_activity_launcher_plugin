@@ -23,7 +23,8 @@
 
 
         </toolWindow>
-
+        <projectService serviceInterface="cn.xjp.plugins.android_act_launcher.storage.RuleConfigService"
+                        serviceImplementation="cn.xjp.plugins.android_act_launcher.storage.RuleConfigService"/>
         <!-- Add your extensions here -->
     </extensions>
 

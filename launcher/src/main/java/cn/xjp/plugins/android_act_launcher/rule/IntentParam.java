@@ -1,7 +1,11 @@
 package cn.xjp.plugins.android_act_launcher.rule;
 
+import com.intellij.util.xmlb.annotations.Transient;
+
 public class IntentParam {
+    @Transient
     static final String[] COLUMN_NAMES = new String[]{"active", "Key", "Type", "RealTypePath", "JsonOfValue"};
+    @Transient
     static final String[] TYPE_NAMES = new String[]{
             "String or String array",
             "int or int array",
@@ -20,11 +24,11 @@ public class IntentParam {
             "String ArrayList",
 //            "charSequence ArrayList",
     };
-    private boolean isActive = true;
-    private String key;
-    private String type;
-    private String value;
-    private String realType = "PrimitiveOrString";
+    public boolean isActive = true;
+    public String key;
+    public String type;
+    public String value;
+    public String realType = "PrimitiveOrString";
 
     public IntentParam() {
     }
@@ -37,7 +41,7 @@ public class IntentParam {
         this.realType = realType;
     }
 
-    Object getValueColumn(int columnIndex) {
+    Object valueColumn(int columnIndex) {
         switch (columnIndex) {
             case 0:
                 return isActive;
@@ -68,6 +72,26 @@ public class IntentParam {
 
     public String getValue() {
         return value;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setRealType(String realType) {
+        this.realType = realType;
     }
 
     Object[] toRowColumns() {

@@ -4,12 +4,16 @@ import cn.xjp.plugins.android_act_launcher.adb.Bridge;
 import cn.xjp.plugins.android_act_launcher.bean.Rule;
 import cn.xjp.plugins.android_act_launcher.rule.AddOrModifyRuleDialog;
 import cn.xjp.plugins.android_act_launcher.run.LaunchActivityCommand;
+import cn.xjp.plugins.android_act_launcher.storage.RuleConfigService;
 import com.android.builder.model.AndroidProject;
 import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
 import com.android.tools.idea.gradle.project.sync.GradleSyncListener;
 import com.android.tools.idea.gradle.project.sync.GradleSyncState;
+import com.google.gson.Gson;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -21,12 +25,16 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class ActivityLauncher extends JPanel implements ToolWindowFactory, GradleSyncListener {
 
@@ -43,7 +51,8 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     private ToolWindow toolWindow;
     private ModuleManager moduleManager;
     private DefaultListModel<Rule> listModel;
-
+    private Logger logger = Logger.getInstance(ActivityLauncher.class);
+    private RuleConfigService configService;
 
     public ActivityLauncher() {
         super(new BorderLayout());
@@ -55,6 +64,8 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         this.toolWindow = toolWindow;
         moduleManager = ModuleManager.getInstance(project);
+        configService = RuleConfigService.getInstance(project);
+        logger.error(configService.stopApp);
         add(launcherWindowContent, BorderLayout.CENTER);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", false);
@@ -119,6 +130,10 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
             }
 
         });
+        for (Rule item : configService.rules) {
+            listModel.addElement(item);
+        }
+        cbStopApp.setSelected(configService.stopApp);
     }
 
     private void initVariantBox(Project project, ToolWindow toolWindow) {
@@ -140,6 +155,13 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
                     Module module = (Module) item;
                     refreshVariantBox(module);
                 }
+            }
+        });
+
+        cbStopApp.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                configService.stopApp=cbStopApp.isSelected();
             }
         });
     }
@@ -169,6 +191,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     }
 
     public void refreshData(@NotNull Project project) {
+        logger.error(configService.stopApp);
         IDevice[] deviceList = Bridge.getDeviceList(project);
         devicesBox.setModel(new DefaultComboBoxModel<>(deviceList));
 
@@ -238,9 +261,10 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
 
     public void addRule(Rule rule) {
         listModel.add(0, rule);
+        configService.addRule(0, rule);
     }
 
-    public void refreshRules() {
+    public void refreshRules(Rule selectedRule) {
         rulesList.updateUI();
     }
 
@@ -248,6 +272,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         int selectedValue = rulesList.getSelectedIndex();
         if (selectedValue >= 0) {
             listModel.remove(selectedValue);
+            configService.removeRule(selectedValue);
         }
     }
 
