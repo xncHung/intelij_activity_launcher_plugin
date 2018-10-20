@@ -2,17 +2,13 @@ package cn.xjp.plugins.android_act_launcher.rule;
 
 import cn.xjp.plugins.android_act_launcher.ActivityLauncher;
 import cn.xjp.plugins.android_act_launcher.bean.Rule;
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.JBColor;
 import org.apache.http.util.TextUtils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -103,7 +99,7 @@ public class AddOrModifyRuleDialog extends JFrame {
                 activityLauncher.addRule(rule);
             } else {
                 rule.inject(selectedRule);
-                activityLauncher.refreshRules(selectedRule);
+                activityLauncher.refreshRules();
             }
             dispose();
         }

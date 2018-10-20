@@ -1,15 +1,14 @@
 package cn.xjp.plugins.android_act_launcher.storage;
 
-import cn.xjp.plugins.android_act_launcher.ActivityLauncher;
 import cn.xjp.plugins.android_act_launcher.bean.Rule;
-import com.google.gson.Gson;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jdom.Attribute;
+import org.jdom.DataConversionException;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,22 +17,54 @@ import java.util.List;
 
 @State(name = "ActivityLauncherRules",
         storages = {@Storage("ActivityLauncherRules.xml")})
-public class RuleConfigService implements PersistentStateComponent<RuleConfigService> {
+public class RuleConfigService implements PersistentStateComponent<Element> {
     public List<Rule> rules = new ArrayList<>();
     public boolean stopApp = true;
-    private Logger logger = Logger.getInstance(ActivityLauncher.class);
 
     @Nullable
     @Override
-    public RuleConfigService getState() {
-        logger.error("getState");
-        return this;
+    public Element getState() {
+        Element config = new Element("config");
+        Element option_stopApp = new Element("option");
+        option_stopApp.setAttribute("name", "stopApp");
+        option_stopApp.setAttribute("value", String.valueOf(stopApp));
+        config.addContent(option_stopApp);
+
+
+        Element option_rules = new Element("option");
+        option_rules.setAttribute("name", "rules");
+        Element list = new Element("list");
+        for (Rule item : rules) {
+            list.addContent(item.toXmlElement());
+        }
+        option_rules.addContent(list);
+        config.addContent(option_rules);
+        return config;
     }
 
     @Override
-    public void loadState(@NotNull RuleConfigService state) {
-        logger.error(new Gson().toJson(state));
-        XmlSerializerUtil.copyBean(state, this);
+    public void loadState(@NotNull Element state) {
+        List<Element> elements = state.getChildren("option");
+        for (Element item : elements) {
+            Attribute name = item.getAttribute("name");
+            switch (name.getValue()) {
+                case "stopApp":
+                    Attribute value = item.getAttribute("value");
+                    try {
+                        stopApp = value.getBooleanValue();
+                    } catch (DataConversionException e) {
+                        stopApp = true;
+                    }
+                    break;
+                case "rules":
+                    Element list = item.getChild("list");
+                    List<Element> rule = list.getChildren("Rule");
+                    for (Element ruleItem : rule) {
+                        rules.add(Rule.fromXml(ruleItem));
+                    }
+                    break;
+            }
+        }
     }
 
 

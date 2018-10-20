@@ -10,11 +10,7 @@ import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
 import com.android.tools.idea.gradle.project.sync.GradleSyncListener;
 import com.android.tools.idea.gradle.project.sync.GradleSyncState;
-import com.google.gson.Gson;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -25,7 +21,6 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -34,7 +29,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
 
 public class ActivityLauncher extends JPanel implements ToolWindowFactory, GradleSyncListener {
 
@@ -48,10 +42,8 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     private JPanel ruleActionContainer;
     private JLabel errorTip;
     private JCheckBox cbStopApp;
-    private ToolWindow toolWindow;
     private ModuleManager moduleManager;
     private DefaultListModel<Rule> listModel;
-    private Logger logger = Logger.getInstance(ActivityLauncher.class);
     private RuleConfigService configService;
 
     public ActivityLauncher() {
@@ -62,10 +54,8 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     // Create the tool window content.
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        this.toolWindow = toolWindow;
         moduleManager = ModuleManager.getInstance(project);
         configService = RuleConfigService.getInstance(project);
-        logger.error(configService.stopApp);
         add(launcherWindowContent, BorderLayout.CENTER);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", false);
@@ -81,12 +71,12 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
 //            }
 //        }.install(toolWindow.getComponent());
         errorTip.setForeground(JBColor.RED);
-        initDeviceBox(project, toolWindow);
-        initModuleBox(project, toolWindow);
-        initVariantBox(project, toolWindow);
+        initDeviceBox();
+        initModuleBox();
+        initVariantBox();
         initRouterList();
 
-        initListeners(project);
+        initListeners();
 
         initRuleActionBar();
         initRunActionBar();
@@ -136,7 +126,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         cbStopApp.setSelected(configService.stopApp);
     }
 
-    private void initVariantBox(Project project, ToolWindow toolWindow) {
+    private void initVariantBox() {
         variantBox.setRenderer(new ListCellRendererWrapper<String>() {
             @Override
             public void customize(JList list, String value, int index, boolean selected, boolean hasFocus) {
@@ -146,7 +136,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         });
     }
 
-    private void initListeners(Project project) {
+    private void initListeners() {
         moduleBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -191,7 +181,6 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     }
 
     public void refreshData(@NotNull Project project) {
-        logger.error(configService.stopApp);
         IDevice[] deviceList = Bridge.getDeviceList(project);
         devicesBox.setModel(new DefaultComboBoxModel<>(deviceList));
 
@@ -211,7 +200,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         }
     }
 
-    private void initModuleBox(Project project, ToolWindow toolWindow) {
+    private void initModuleBox() {
         moduleBox.setRenderer(new ListCellRendererWrapper<Module>() {
             @Override
             public void customize(JList list, Module value, int index, boolean selected, boolean hasFocus) {
@@ -220,7 +209,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         });
     }
 
-    private void initDeviceBox(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+    private void initDeviceBox() {
 
         devicesBox.setRenderer(new ListCellRendererWrapper<IDevice>() {
             @Override
@@ -264,7 +253,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         configService.addRule(0, rule);
     }
 
-    public void refreshRules(Rule selectedRule) {
+    public void refreshRules() {
         rulesList.updateUI();
     }
 
