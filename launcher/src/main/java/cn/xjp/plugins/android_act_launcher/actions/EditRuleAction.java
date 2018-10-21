@@ -7,7 +7,7 @@ public class EditRuleAction extends BaseAction {
 
     @Override
     protected void handleEvent(ActivityLauncher activityLauncher, AnActionEvent anActionEvent) {
-        activityLauncher.openEditRuleDialog();
+        activityLauncher.openEditRuleDialog(anActionEvent.getProject());
     }
 
     @Override

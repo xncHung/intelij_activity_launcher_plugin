@@ -14,7 +14,7 @@ public class AddNewRuleAction extends BaseAction {
 
     @Override
     protected void handleEvent(ActivityLauncher activityLauncher, AnActionEvent anActionEvent) {
-        activityLauncher.openAddRuleDialog();
+        activityLauncher.openAddRuleDialog(anActionEvent.getProject());
     }
 
 }

@@ -156,12 +156,12 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         });
     }
 
-    public void openAddRuleDialog() {
-        openRuleDialog(null);
+    public void openAddRuleDialog(Project project) {
+        openRuleDialog(project,null);
     }
 
-    private void openRuleDialog(Rule selectedValue) {
-        AddOrModifyRuleDialog addNewRuleDialog = new AddOrModifyRuleDialog(this, selectedValue);
+    private void openRuleDialog(Project project, Rule selectedValue) {
+        AddOrModifyRuleDialog addNewRuleDialog = new AddOrModifyRuleDialog(project,this, selectedValue);
         addNewRuleDialog.setSize(1000, 500);
         addNewRuleDialog.setLocationRelativeTo(null);
         addNewRuleDialog.setResizable(false);
@@ -265,12 +265,12 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         }
     }
 
-    public void openEditRuleDialog() {
+    public void openEditRuleDialog(Project project) {
         Rule selectedValue = rulesList.getSelectedValue();
         if (selectedValue == null) {
             return;
         }
-        openRuleDialog(selectedValue);
+        openRuleDialog(project, selectedValue);
     }
 
     public void submitRun(Project project, boolean debug) {

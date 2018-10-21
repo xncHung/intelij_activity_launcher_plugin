@@ -2,8 +2,19 @@ package cn.xjp.plugins.android_act_launcher.rule;
 
 import cn.xjp.plugins.android_act_launcher.ActivityLauncher;
 import cn.xjp.plugins.android_act_launcher.bean.Rule;
+import com.android.tools.idea.run.editor.LaunchOptionConfigurableContext;
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.ui.ComboboxWithBrowseButton;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.LanguageTextField;
 import org.apache.http.util.TextUtils;
 
 import javax.swing.*;
@@ -15,7 +26,7 @@ import java.util.ArrayList;
 public class AddOrModifyRuleDialog extends JFrame {
     private final ActivityLauncher activityLauncher;
     private final Rule selectedRule;
-    private JTextField targetAct;
+    private final Project project;
     private JButton addNewParam;
     private JButton removeParam;
     private JButton okBtn;
@@ -24,10 +35,12 @@ public class AddOrModifyRuleDialog extends JFrame {
     private JPanel rootContent;
     private JTable paramTable;
     private JLabel errorTip;
+    private ComponentWithBrowseButton actSelector;
     private ParamItemModel dataModel;
 
-    public AddOrModifyRuleDialog(ActivityLauncher activityLauncher, Rule selectedValue) {
+    public AddOrModifyRuleDialog(Project project, ActivityLauncher activityLauncher, Rule selectedValue) {
         setContentPane(rootContent);
+        this.project = project;
         this.selectedRule = selectedValue;
         setAlwaysOnTop(true);
         this.activityLauncher = activityLauncher;
@@ -65,7 +78,7 @@ public class AddOrModifyRuleDialog extends JFrame {
 
     private void initData() {
         ruleName.setText(selectedRule.getName());
-        targetAct.setText(selectedRule.getTarget());
+        actSelector.setText(selectedRule.getTarget());
         if (selectedRule.getParams() != null) {
             for (IntentParam item : selectedRule.getParams()) {
                 dataModel.addRow(item.toRowColumns());
@@ -171,4 +184,21 @@ public class AddOrModifyRuleDialog extends JFrame {
         dispose();
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        final EditorTextField editorTextField = new LanguageTextField(PlainTextLanguage.INSTANCE,project , "") {
+            @Override
+            protected EditorEx createEditor() {
+                final EditorEx editor = super.createEditor();
+                final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+
+                if (file != null) {
+                    DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(file, false);
+                }
+                editor.putUserData(LaunchOptionConfigurableContext.KEY, myContext);
+                return editor;
+            }
+        };
+        actSelector=new ComponentWithBrowseButton<EditorTextField>(editorTextField,null);
+    }
 }
