@@ -11,11 +11,9 @@ import java.util.List;
 
 class ParamItemModel extends DefaultTableModel {
 
-    private final Logger logger;
 
     public ParamItemModel() {
         super(IntentParam.COLUMN_NAMES, 0);
-        logger = Logger.getInstance(ParamItemModel.class);
     }
 
     @Override
