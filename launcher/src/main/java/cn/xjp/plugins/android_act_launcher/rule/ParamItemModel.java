@@ -37,13 +37,13 @@ class ParamItemModel extends DefaultTableModel {
 
     @Override
     public void setValueAt(Object aValue, int row, int column) {
-        if (column == 2) {
+        if (aValue != null && column == 2) {
             String s = aValue.toString();
             if (!s.startsWith("Parcelable") && !s.startsWith("Serializable")) {
-                setValueAt("PrimitiveOrString", row, 3);
+                setValueAt(Constant.PRIMITIVE_OR_STRING, row, 3);
             } else {
                 Object value = getValueAt(row, 3);
-                if ("PrimitiveOrString".startsWith(value.toString())) {
+                if (Constant.PRIMITIVE_OR_STRING.startsWith(value.toString())) {
                     setValueAt("", row, 3);
                 }
             }

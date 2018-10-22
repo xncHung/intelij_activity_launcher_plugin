@@ -13,7 +13,13 @@ public class StartAction extends BaseAction {
     @Override
     public void update(AnActionEvent e) {
         ActivityLauncher activityLauncher = getActivityLauncher(e);
-        e.getPresentation().setEnabled(activityLauncher != null && activityLauncher.getSelectedRule() != null);
+        e.getPresentation().setEnabled(
+                activityLauncher != null
+                        && activityLauncher.getSelectedRule() != null
+                        && activityLauncher.getSelectedDevice() != null
+                        && activityLauncher.getSelectedModule() != null
+                        && activityLauncher.getSelectedVariant() != null
+        );
     }
 
 }

@@ -45,6 +45,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     private ModuleManager moduleManager;
     private DefaultListModel<Rule> listModel;
     private RuleConfigService configService;
+    private DefaultComboBoxModel<Module> moduleModel;
 
     public ActivityLauncher() {
         super(new BorderLayout());
@@ -151,21 +152,24 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         cbStopApp.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                configService.stopApp=cbStopApp.isSelected();
+                configService.stopApp = cbStopApp.isSelected();
             }
         });
     }
 
     public void openAddRuleDialog(Project project) {
-        openRuleDialog(project,null);
+        openRuleDialog(project, null);
     }
 
     private void openRuleDialog(Project project, Rule selectedValue) {
-        AddOrModifyRuleDialog addNewRuleDialog = new AddOrModifyRuleDialog(project,this, selectedValue);
+        Module module = (Module) moduleModel.getSelectedItem();
+        if (module == null) {
+            showError("select a module");
+            return;
+        }
+        AddOrModifyRuleDialog addNewRuleDialog = new AddOrModifyRuleDialog(project, module, this, selectedValue);
         addNewRuleDialog.setSize(1000, 500);
-        addNewRuleDialog.setLocationRelativeTo(null);
-        addNewRuleDialog.setResizable(false);
-        addNewRuleDialog.setVisible(true);
+        addNewRuleDialog.show();
     }
 
     private void refreshVariantBox(Module module) {
@@ -192,11 +196,11 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
                 apps.add(module);
             }
         }
-        DefaultComboBoxModel<Module> aModel = new DefaultComboBoxModel<>(apps);
-        moduleBox.setModel(aModel);
-        if (aModel.getSize() >= 1) {
+        moduleModel = new DefaultComboBoxModel<>(apps);
+        moduleBox.setModel(moduleModel);
+        if (moduleModel.getSize() >= 1) {
             moduleBox.setSelectedIndex(0);
-            refreshVariantBox(aModel.getElementAt(0));
+            refreshVariantBox(moduleModel.getElementAt(0));
         }
     }
 
@@ -307,4 +311,30 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     public Rule getSelectedRule() {
         return rulesList.getSelectedValue();
     }
+
+    public IDevice getSelectedDevice() {
+        Object selectedItem = devicesBox.getSelectedItem();
+        if (selectedItem instanceof IDevice) {
+            return (IDevice) selectedItem;
+        }
+        return null;
+    }
+
+    public Module getSelectedModule() {
+        Object selectedItem = moduleBox.getSelectedItem();
+        if (selectedItem instanceof Module) {
+            return (Module) selectedItem;
+        }
+        return null;
+    }
+
+
+    public String getSelectedVariant() {
+        Object selectedItem = variantBox.getSelectedItem();
+        if (selectedItem instanceof String) {
+            return (String) selectedItem;
+        }
+        return null;
+    }
+
 }

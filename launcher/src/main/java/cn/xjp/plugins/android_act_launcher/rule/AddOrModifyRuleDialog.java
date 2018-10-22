@@ -1,59 +1,62 @@
 package cn.xjp.plugins.android_act_launcher.rule;
 
+import android.os.Parcelable;
 import cn.xjp.plugins.android_act_launcher.ActivityLauncher;
 import cn.xjp.plugins.android_act_launcher.bean.Rule;
-import com.android.tools.idea.run.editor.LaunchOptionConfigurableContext;
+import com.android.tools.idea.run.activity.ActivityLocatorUtils;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.ide.util.TreeClassChooser;
+import com.intellij.ide.util.TreeClassChooserFactory;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.ui.ComboboxWithBrowseButton;
+import com.intellij.psi.search.ProjectScope;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.LanguageTextField;
 import org.apache.http.util.TextUtils;
+import org.jetbrains.android.util.AndroidBundle;
+import org.jetbrains.android.util.AndroidUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class AddOrModifyRuleDialog extends JFrame {
+public class AddOrModifyRuleDialog extends DialogWrapper {
     private final ActivityLauncher activityLauncher;
     private final Rule selectedRule;
     private final Project project;
+    private final Module module;
     private JButton addNewParam;
     private JButton removeParam;
-    private JButton okBtn;
-    private JButton cancel;
     private JTextField ruleName;
     private JPanel rootContent;
     private JTable paramTable;
     private JLabel errorTip;
-    private ComponentWithBrowseButton actSelector;
+    private ComponentWithBrowseButton<EditorTextField> actSelector;
     private ParamItemModel dataModel;
 
-    public AddOrModifyRuleDialog(Project project, ActivityLauncher activityLauncher, Rule selectedValue) {
-        setContentPane(rootContent);
+    public AddOrModifyRuleDialog(Project project, Module module, ActivityLauncher activityLauncher, Rule selectedValue) {
+        super(project, true);
         this.project = project;
+        this.module = module;
         this.selectedRule = selectedValue;
-        setAlwaysOnTop(true);
         this.activityLauncher = activityLauncher;
-        getRootPane().setDefaultButton(okBtn);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
-        okBtn.addActionListener(e -> onOkBtn());
-        cancel.addActionListener(e -> onCancel());
         initParamList();
         removeParam.setEnabled(false);
         errorTip.setForeground(JBColor.RED);
@@ -74,11 +77,38 @@ public class AddOrModifyRuleDialog extends JFrame {
         if (this.selectedRule != null) {
             initData();
         }
+
+        actSelector.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!project.isInitialized()) {
+                    return;
+                }
+                final JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+                PsiClass activityBaseClass = facade.findClass(AndroidUtils.ACTIVITY_BASE_CLASS_NAME, ProjectScope.getAllScope(project));
+                if (activityBaseClass == null) {
+                    Messages.showErrorDialog(project, AndroidBundle.message("cant.find.activity.class.error"), " Select Activity");
+                    return;
+                }
+                PsiClass initialSelection =
+                        facade.findClass(actSelector.getChildComponent().getText(), module.getModuleWithDependenciesScope());
+                TreeClassChooser chooser = TreeClassChooserFactory.getInstance(project)
+                        .createInheritanceClassChooser("Select Activity Class", module.getModuleWithDependenciesScope(), activityBaseClass,
+                                initialSelection, null);
+                chooser.showDialog();
+                PsiClass selClass = chooser.getSelected();
+                if (selClass != null) {
+                    actSelector.getChildComponent().setText(ActivityLocatorUtils.getQualifiedActivityName(selClass));
+                }
+            }
+        });
+        init();
+        setTitle((selectedValue != null ? "Modify" : "Add New") + " Activity Launch");
     }
 
     private void initData() {
         ruleName.setText(selectedRule.getName());
-        actSelector.setText(selectedRule.getTarget());
+        actSelector.getChildComponent().setText(selectedRule.getTarget());
         if (selectedRule.getParams() != null) {
             for (IntentParam item : selectedRule.getParams()) {
                 dataModel.addRow(item.toRowColumns());
@@ -105,7 +135,8 @@ public class AddOrModifyRuleDialog extends JFrame {
 
     }
 
-    private void onOkBtn() {
+    @Override
+    protected void doOKAction() {
         Rule rule = generateRule();
         if (rule != null) {
             if (selectedRule == null) {
@@ -114,7 +145,7 @@ public class AddOrModifyRuleDialog extends JFrame {
                 rule.inject(selectedRule);
                 activityLauncher.refreshRules();
             }
-            dispose();
+            super.doOKAction();
         }
     }
 
@@ -124,9 +155,9 @@ public class AddOrModifyRuleDialog extends JFrame {
             showError("please input Name");
             return null;
         }
-        String path = targetAct.getText();
+        String path = actSelector.getChildComponent().getText();
         if (TextUtils.isEmpty(path) || !checkActPath(path)) {
-            showError("target Activity is empty or not exist");
+            showError("target Activity is incorrect or not exist");
             return null;
         }
         ArrayList<IntentParam> params = new ArrayList<>();
@@ -153,7 +184,7 @@ public class AddOrModifyRuleDialog extends JFrame {
             } else if (!TextUtils.isEmpty(key) ||
                     !TextUtils.isEmpty(type) ||
                     !TextUtils.isEmpty(value) ||
-                    (!TextUtils.isEmpty(realType) && checkTypePath(realType))
+                    (!TextUtils.isEmpty(realType) && checkTypePath(type, realType))
             ) {
                 params.add(new IntentParam(false, key, type, realType, value));
             }
@@ -161,13 +192,36 @@ public class AddOrModifyRuleDialog extends JFrame {
         return new Rule(name, path, params);
     }
 
-    private boolean checkTypePath(String realType) {
+    private boolean checkTypePath(String type, String realType) {
+        if (Constant.PRIMITIVE_OR_STRING.equals(realType)) {
+            return true;
+        }
+        JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+        PsiClass aClass = facade.findClass(realType, module.getModuleWithDependenciesAndLibrariesScope(false));
+        PsiClass parce = facade.findClass(Parcelable.class.getName(), ProjectScope.getAllScope(project));
+        PsiClass seri = facade.findClass(Serializable.class.getName(), ProjectScope.getAllScope(project));
+
+        if (aClass == null) {
+            showError("class:" + realType + " is not exist!");
+            return false;
+        }
+        if (aClass.hasTypeParameters() || aClass.isInterface()) {
+            showError("Interface or Parameterized Type is not support!");
+            return false;
+        }
+        if ((parce == null || !aClass.isInheritor(parce, false)) && (seri == null || !aClass.isInheritor(seri, false))) {
+            showError("realType must be Parcelable or Serializable! ");
+            return false;
+        }
         return true;
     }
 
     private boolean checkActPath(String path) {
-        return true;
-// TODO: 2018/10/13 check target path
+        JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+        PsiClass aClass = facade.findClass(path, ProjectScope.getAllScope(project));
+        PsiClass parent = facade.findClass(AndroidUtils.ACTIVITY_BASE_CLASS_NAME, ProjectScope.getAllScope(project));
+        return aClass != null && parent != null && !aClass.isInheritor(parent, false);
+
     }
 
     private void showError(String msg) {
@@ -180,13 +234,9 @@ public class AddOrModifyRuleDialog extends JFrame {
         }).start();
     }
 
-    private void onCancel() {
-        dispose();
-    }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
-        final EditorTextField editorTextField = new LanguageTextField(PlainTextLanguage.INSTANCE,project , "") {
+        final EditorTextField editorTextField = new LanguageTextField(PlainTextLanguage.INSTANCE, project, "") {
             @Override
             protected EditorEx createEditor() {
                 final EditorEx editor = super.createEditor();
@@ -195,10 +245,17 @@ public class AddOrModifyRuleDialog extends JFrame {
                 if (file != null) {
                     DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(file, false);
                 }
-                editor.putUserData(LaunchOptionConfigurableContext.KEY, myContext);
                 return editor;
             }
         };
-        actSelector=new ComponentWithBrowseButton<EditorTextField>(editorTextField,null);
+        actSelector = new ComponentWithBrowseButton<EditorTextField>(editorTextField, null);
     }
+
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return rootContent;
+    }
+
+
 }

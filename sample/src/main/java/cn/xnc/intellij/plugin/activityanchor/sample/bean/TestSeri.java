@@ -9,4 +9,13 @@ public class TestSeri implements Serializable {
     String id;
     int testInt;
     boolean testBoolean;
+
+    @Override
+    public String toString() {
+        return "TestSeri{" +
+                "id='" + id + '\'' +
+                ", testInt=" + testInt +
+                ", testBoolean=" + testBoolean +
+                '}';
+    }
 }

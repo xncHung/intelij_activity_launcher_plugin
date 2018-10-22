@@ -235,7 +235,7 @@ public class Anchor extends Activity {
                         intent.putExtra(key, dataArray);
                     }
                 } else {
-                    intent.putExtra(key, value);
+                    intent.putExtra(key, (Parcelable) gson.fromJson(value, realType));
                 }
                 break;
         }

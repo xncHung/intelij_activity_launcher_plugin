@@ -30,7 +30,7 @@ public class IntentParam {
     private String key;
     private String type;
     private String value;
-    private String realType = "PrimitiveOrString";
+    private String realType = Constant.PRIMITIVE_OR_STRING;
 
     IntentParam() {
     }

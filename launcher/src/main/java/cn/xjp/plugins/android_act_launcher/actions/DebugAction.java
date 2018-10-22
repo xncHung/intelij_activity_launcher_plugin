@@ -8,12 +8,18 @@ public class DebugAction extends BaseAction {
 
     @Override
     protected void handleEvent(ActivityLauncher activityLauncher, AnActionEvent anActionEvent) {
-        activityLauncher.submitRun(anActionEvent.getProject(),true);
+        activityLauncher.submitRun(anActionEvent.getProject(), true);
     }
 
     @Override
     public void update(AnActionEvent e) {
         ActivityLauncher activityLauncher = getActivityLauncher(e);
-        e.getPresentation().setEnabled(activityLauncher != null && activityLauncher.getSelectedRule() != null);
+        e.getPresentation().setEnabled(
+                activityLauncher != null
+                        && activityLauncher.getSelectedRule() != null
+                        && activityLauncher.getSelectedDevice() != null
+                        && activityLauncher.getSelectedModule() != null
+                        && activityLauncher.getSelectedVariant() != null
+        );
     }
 }
