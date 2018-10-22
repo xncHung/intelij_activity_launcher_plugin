@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ActivityLauncherRules">
+    <option name="stopApp" value="true" />
+    <option name="rules">
+      <list>
+        <Rule>
+          <option name="name" value="test" />
+          <option name="target" value="cn.xnc.intellij.plugin.activityanchor.sample.Main2Activity" />
+          <option name="params">
+            <list>
+              <IntentParam>
+                <option name="isActive" value="true" />
+                <option name="key" value="testString" />
+                <option name="type" value="String or String array" />
+                <option name="realType" value="PrimitiveOrString" />
+                <option name="value" value="fsdfs" />
+              </IntentParam>
+              <IntentParam>
+                <option name="isActive" value="true" />
+                <option name="key" value="testInt" />
+                <option name="type" value="int or int array" />
+                <option name="realType" value="PrimitiveOrString" />
+                <option name="value" value="19" />
+              </IntentParam>
+              <IntentParam>
+                <option name="isActive" value="true" />
+                <option name="key" value="testStrArray" />
+                <option name="type" value="String or String array" />
+                <option name="realType" value="PrimitiveOrString" />
+                <option name="value" value="[&quot;str1&quot;,&quot;str2&quot;]" />
+              </IntentParam>
+              <IntentParam>
+                <option name="isActive" value="true" />
+                <option name="key" value="testParc" />
+                <option name="type" value="Parcelable or Parcelable array" />
+                <option name="realType" value="cn.xnc.intellij.plugin.activityanchor.sample.bean.TestBean" />
+                <option name="value" value="{name:&quot;xiaoming&quot;,age:18,desc:&quot;goodBoy!&quot;}" />
+              </IntentParam>
+              <IntentParam>
+                <option name="isActive" value="true" />
+                <option name="key" value="testSeri" />
+                <option name="type" value="Serializable" />
+                <option name="realType" value="cn.xnc.intellij.plugin.activityanchor.sample.bean.TestSeri" />
+                <option name="value" value="{rawId:100,testInt:67,testBoolean:false}" />
+              </IntentParam>
+            </list>
+          </option>
+        </Rule>
+      </list>
+    </option>
+  </component>
+</project>
