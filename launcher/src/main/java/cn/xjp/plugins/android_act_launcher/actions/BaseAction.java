@@ -18,7 +18,7 @@ public abstract class BaseAction extends DumbAwareAction {
     protected abstract void handleEvent(ActivityLauncher activityLauncher, AnActionEvent anActionEvent);
 
     @Nullable
-    protected ActivityLauncher getActivityLauncher(AnActionEvent anActionEvent) {
+    ActivityLauncher getActivityLauncher(AnActionEvent anActionEvent) {
         Project project = anActionEvent.getProject();
         if (project == null) {
             return null;

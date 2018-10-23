@@ -11,10 +11,7 @@ import android.util.Base64;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
@@ -67,18 +64,23 @@ public class Anchor extends Activity {
     }
 
 
-    private void resolveParam(Intent intent, ParamItem param) throws ClassNotFoundException {
+    private void resolveParam(Intent intent, ParamItem param) throws Exception {
         String type = param.getType();
         Class realType;
         String realTypePath = param.getRealType();
         String value = param.getValue();
         String key = param.getKey();
-        JsonElement jsonElement = new JsonParser().parse(value);
+        JsonElement jsonElement = null;
+        try {
+            jsonElement = new JsonParser().parse(value);
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
         JsonArray array;
         switch (type) {
             case STRING_OR_STRING_ARRAY:
             case STRING_ARRAY_LIST:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     String[] strArray = new String[array.size()];
                     ArrayList<String> strings = new ArrayList<>();
@@ -98,7 +100,7 @@ public class Anchor extends Activity {
                 break;
             case INT_OR_INT_ARRAY:
             case INTEGER_ARRAY_LIST:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     int[] intArray = new int[array.size()];
                     ArrayList<Integer> integers = new ArrayList<>();
@@ -113,7 +115,7 @@ public class Anchor extends Activity {
                         intent.putExtra(key, intArray);
                     }
                 } else {
-                    intent.putExtra(key, jsonElement.getAsInt());
+                    intent.putExtra(key, Integer.parseInt(value));
                 }
                 break;
             case SERIALIZABLE:
@@ -126,7 +128,7 @@ public class Anchor extends Activity {
                 intent.putExtra(key, o);
                 break;
             case BOOLEAN_OR_BOOLEAN_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     boolean[] dataArray = new boolean[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -134,11 +136,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsBoolean());
+                    intent.putExtra(key, Boolean.parseBoolean(value));
                 }
                 break;
             case BYTE_OR_BYTE_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     byte[] dataArray = new byte[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -146,11 +148,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsByte());
+                    intent.putExtra(key, Byte.parseByte(value));
                 }
                 break;
             case CHAR_OR_CHAR_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     char[] dataArray = new char[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -158,11 +160,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsCharacter());
+                    intent.putExtra(key, value.length() > 0 ? value.charAt(0) : ' ');
                 }
                 break;
             case FLOAT_OR_FLOAT_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     float[] dataArray = new float[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -170,11 +172,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsFloat());
+                    intent.putExtra(key, Float.parseFloat(value));
                 }
                 break;
             case DOUBLE_OR_DOUBLE_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     double[] dataArray = new double[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -182,11 +184,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsDouble());
+                    intent.putExtra(key, Double.parseDouble(value));
                 }
                 break;
             case LONG_OR_LONG_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     long[] dataArray = new long[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -194,11 +196,11 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsLong());
+                    intent.putExtra(key, Long.parseLong(value));
                 }
                 break;
             case SHORT_OR_SHORT_ARRAY:
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     short[] dataArray = new short[array.size()];
                     for (int index = 0; index < dataArray.length; index++) {
@@ -206,7 +208,7 @@ public class Anchor extends Activity {
                     }
                     intent.putExtra(key, dataArray);
                 } else {
-                    intent.putExtra(key, jsonElement.getAsShort());
+                    intent.putExtra(key, Short.parseShort(value));
                 }
                 break;
             case PARCELABLE_ARRAY_LIST:
@@ -216,7 +218,7 @@ public class Anchor extends Activity {
                     throw new IllegalStateException("ParameterizedType is not supported!");
                 if (!Util.checkParcelable(realType))
                     throw new IllegalStateException(realType.getName() + " is not implement Parcelable!");
-                if (jsonElement.isJsonArray()) {
+                if (jsonElement != null && jsonElement.isJsonArray()) {
                     array = jsonElement.getAsJsonArray();
                     Parcelable[] dataArray = new Parcelable[array.size()];
                     ArrayList<Parcelable> parcelables = new ArrayList<>();

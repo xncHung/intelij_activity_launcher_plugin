@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AddNewRuleAction extends BaseAction {
@@ -17,4 +18,13 @@ public class AddNewRuleAction extends BaseAction {
         activityLauncher.openAddRuleDialog(anActionEvent.getProject());
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        ActivityLauncher activityLauncher = getActivityLauncher(e);
+        e.getPresentation().setEnabled(
+                activityLauncher != null
+                        && activityLauncher.getSelectedRule() != null
+                        && activityLauncher.getSelectedModule() != null
+        );
+    }
 }

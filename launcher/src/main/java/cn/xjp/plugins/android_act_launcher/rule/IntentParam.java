@@ -112,4 +112,8 @@ public class IntentParam {
 
         return intentParam;
     }
+
+    boolean isActive() {
+        return isActive;
+    }
 }

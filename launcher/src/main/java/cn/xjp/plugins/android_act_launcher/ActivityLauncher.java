@@ -1,7 +1,7 @@
 package cn.xjp.plugins.android_act_launcher;
 
 import cn.xjp.plugins.android_act_launcher.adb.Bridge;
-import cn.xjp.plugins.android_act_launcher.bean.Rule;
+import cn.xjp.plugins.android_act_launcher.rule.Rule;
 import cn.xjp.plugins.android_act_launcher.rule.AddOrModifyRuleDialog;
 import cn.xjp.plugins.android_act_launcher.run.LaunchActivityCommand;
 import cn.xjp.plugins.android_act_launcher.storage.RuleConfigService;
@@ -41,7 +41,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     private JPanel runActionContainer;
     private JPanel ruleActionContainer;
     private JLabel errorTip;
-    private JCheckBox cbStopApp;
+    private JCheckBox cbClearData;
     private ModuleManager moduleManager;
     private DefaultListModel<Rule> listModel;
     private RuleConfigService configService;
@@ -124,7 +124,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         for (Rule item : configService.rules) {
             listModel.addElement(item);
         }
-        cbStopApp.setSelected(configService.stopApp);
+        cbClearData.setSelected(configService.clearData);
     }
 
     private void initVariantBox() {
@@ -149,10 +149,10 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
             }
         });
 
-        cbStopApp.addChangeListener(new ChangeListener() {
+        cbClearData.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                configService.stopApp = cbStopApp.isSelected();
+                configService.clearData = cbClearData.isSelected();
             }
         });
     }
@@ -295,7 +295,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         IDevice device = (IDevice) selectedItem;
         Module module = (Module) boxSelectedItem;
 
-        new LaunchActivityCommand(selectedRule, debug, cbStopApp.isSelected()).apply(project, device, module);
+        new LaunchActivityCommand(selectedRule, debug, cbClearData.isSelected()).apply(project, device, module);
     }
 
     private void showError(String msg) {

@@ -1,6 +1,6 @@
 package cn.xjp.plugins.android_act_launcher.storage;
 
-import cn.xjp.plugins.android_act_launcher.bean.Rule;
+import cn.xjp.plugins.android_act_launcher.rule.Rule;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -19,15 +19,15 @@ import java.util.List;
         storages = {@Storage("ActivityLauncherRules.xml")})
 public class RuleConfigService implements PersistentStateComponent<Element> {
     public List<Rule> rules = new ArrayList<>();
-    public boolean stopApp = true;
+    public boolean clearData = true;
 
     @Nullable
     @Override
     public Element getState() {
         Element config = new Element("config");
         Element option_stopApp = new Element("option");
-        option_stopApp.setAttribute("name", "stopApp");
-        option_stopApp.setAttribute("value", String.valueOf(stopApp));
+        option_stopApp.setAttribute("name", "clearData");
+        option_stopApp.setAttribute("value", String.valueOf(clearData));
         config.addContent(option_stopApp);
 
 
@@ -48,12 +48,12 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
         for (Element item : elements) {
             Attribute name = item.getAttribute("name");
             switch (name.getValue()) {
-                case "stopApp":
+                case "clearData":
                     Attribute value = item.getAttribute("value");
                     try {
-                        stopApp = value.getBooleanValue();
+                        clearData = value.getBooleanValue();
                     } catch (DataConversionException e) {
-                        stopApp = true;
+                        clearData = true;
                     }
                     break;
                 case "rules":

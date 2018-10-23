@@ -2,7 +2,6 @@ package cn.xjp.plugins.android_act_launcher.rule;
 
 import android.os.Parcelable;
 import cn.xjp.plugins.android_act_launcher.ActivityLauncher;
-import cn.xjp.plugins.android_act_launcher.bean.Rule;
 import com.android.tools.idea.run.activity.ActivityLocatorUtils;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.ide.util.TreeClassChooser;
@@ -26,13 +25,11 @@ import com.intellij.ui.LanguageTextField;
 import org.apache.http.util.TextUtils;
 import org.jetbrains.android.util.AndroidBundle;
 import org.jetbrains.android.util.AndroidUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -132,7 +129,7 @@ public class AddOrModifyRuleDialog extends DialogWrapper {
         paramTable.setModel(dataModel);
         ComboBox<String> comboBox = new ComboBox<>(new DefaultComboBoxModel<>(IntentParam.TYPE_NAMES));
         paramTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(comboBox));
-
+        paramTable.setRowHeight(30);
     }
 
     @Override
@@ -184,7 +181,7 @@ public class AddOrModifyRuleDialog extends DialogWrapper {
             } else if (!TextUtils.isEmpty(key) ||
                     !TextUtils.isEmpty(type) ||
                     !TextUtils.isEmpty(value) ||
-                    (!TextUtils.isEmpty(realType) && checkTypePath(type, realType))
+                    (!TextUtils.isEmpty(realType) && checkTypePath(realType))
             ) {
                 params.add(new IntentParam(false, key, type, realType, value));
             }
@@ -192,7 +189,7 @@ public class AddOrModifyRuleDialog extends DialogWrapper {
         return new Rule(name, path, params);
     }
 
-    private boolean checkTypePath(String type, String realType) {
+    private boolean checkTypePath(String realType) {
         if (Constant.PRIMITIVE_OR_STRING.equals(realType)) {
             return true;
         }
@@ -200,7 +197,6 @@ public class AddOrModifyRuleDialog extends DialogWrapper {
         PsiClass aClass = facade.findClass(realType, module.getModuleWithDependenciesAndLibrariesScope(false));
         PsiClass parce = facade.findClass(Parcelable.class.getName(), ProjectScope.getAllScope(project));
         PsiClass seri = facade.findClass(Serializable.class.getName(), ProjectScope.getAllScope(project));
-
         if (aClass == null) {
             showError("class:" + realType + " is not exist!");
             return false;

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ShellReceiver extends AndroidOutputReceiver {
-    public static final int NO_ERROR = -2;
+    private static final int NO_ERROR = -2;
     public static final int UNTYPED_ERROR = -1;
     private static final Pattern FAILURE = Pattern.compile("Failure\\s+\\[(.*)\\]");
     private static final Pattern TYPED_ERROR = Pattern.compile("Error\\s+[Tt]ype\\s+(\\d+).*");
@@ -16,7 +16,7 @@ public class ShellReceiver extends AndroidOutputReceiver {
     private int errorType;
     private final StringBuilder output;
 
-    public ShellReceiver() {
+    ShellReceiver() {
         this.output = new StringBuilder();
     }
 
@@ -46,11 +46,11 @@ public class ShellReceiver extends AndroidOutputReceiver {
         return false;
     }
 
-    public boolean isSuccess() {
+    boolean isSuccess() {
         return errorType != NO_ERROR;
     }
 
-    public String getErrorMsg() {
+    String getErrorMsg() {
         return failureMessage;
     }
 }

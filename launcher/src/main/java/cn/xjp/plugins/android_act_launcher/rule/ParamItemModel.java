@@ -12,7 +12,7 @@ import java.util.List;
 class ParamItemModel extends DefaultTableModel {
 
 
-    public ParamItemModel() {
+    ParamItemModel() {
         super(IntentParam.COLUMN_NAMES, 0);
     }
 

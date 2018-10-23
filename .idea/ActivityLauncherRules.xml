@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ActivityLauncherRules">
-    <option name="stopApp" value="true" />
+    <option name="clearData" value="false" />
     <option name="rules">
       <list>
+        <Rule>
+          <option name="name" value="test1" />
+          <option name="target" value="cn.xnc.intellij.plugin.activityanchor.sample.MainActivity" />
+          <option name="params">
+            <list />
+          </option>
+        </Rule>
         <Rule>
           <option name="name" value="test" />
           <option name="target" value="cn.xnc.intellij.plugin.activityanchor.sample.Main2Activity" />
@@ -14,7 +21,7 @@
                 <option name="key" value="testString" />
                 <option name="type" value="String or String array" />
                 <option name="realType" value="PrimitiveOrString" />
-                <option name="value" value="fsdfs" />
+                <option name="value" value="I'm a test String!" />
               </IntentParam>
               <IntentParam>
                 <option name="isActive" value="true" />

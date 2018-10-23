@@ -122,12 +122,24 @@
           <component id="a98ba" class="javax.swing.JTable" binding="paramTable">
             <constraints/>
             <properties>
-              <font size="14"/>
+              <autoResizeMode value="3"/>
+              <enabled value="true"/>
+              <fillsViewportHeight value="false"/>
+              <focusCycleRoot value="false"/>
+              <font size="12"/>
+              <inheritsPopupMenu value="false"/>
+              <intercellSpacing width="3" height="3"/>
+              <rowHeight value="40"/>
+              <rowMargin value="3"/>
               <showHorizontalLines value="true"/>
               <showVerticalLines value="true"/>
-              <surrendersFocusOnKeystroke value="false"/>
+              <surrendersFocusOnKeystroke value="true"/>
               <updateSelectionOnSort value="true"/>
             </properties>
+            <clientProperties>
+              <JTable.autoStartsEdit class="java.lang.Boolean" value="false"/>
+              <terminateEditOnFocusLost class="java.lang.Boolean" value="false"/>
+            </clientProperties>
           </component>
         </children>
       </scrollpane>

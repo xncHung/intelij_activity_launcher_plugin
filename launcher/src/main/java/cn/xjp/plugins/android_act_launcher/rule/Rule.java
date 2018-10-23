@@ -1,6 +1,5 @@
-package cn.xjp.plugins.android_act_launcher.bean;
+package cn.xjp.plugins.android_act_launcher.rule;
 
-import cn.xjp.plugins.android_act_launcher.rule.IntentParam;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
@@ -57,16 +56,24 @@ public class Rule {
         return target;
     }
 
-    public List<IntentParam> getParams() {
+    List<IntentParam> getParams() {
         return params;
     }
 
     @Override
     public String toString() {
-        return name + "( " + target + ")";
+        return name + "------>( " + target + ") -- [ " + (params == null || params.isEmpty() ? "no param" : ("with " + getActiveParamCount() + " params")) + " ]";
     }
 
-    public void inject(Rule selectedRule) {
+    private int getActiveParamCount() {
+        int count = 0;
+        for (IntentParam item : params) {
+            if (item.isActive()) count++;
+        }
+        return count;
+    }
+
+    void inject(Rule selectedRule) {
         selectedRule.name = this.name;
         selectedRule.target = this.target;
         selectedRule.params = this.params;
@@ -94,5 +101,13 @@ public class Rule {
         rule.addContent(option_params);
 
         return rule;
+    }
+
+    public List<IntentParam> getActiveParams() {
+        ArrayList<IntentParam> result = new ArrayList<>();
+        for (IntentParam item : params) {
+            if (item.isActive()) result.add(item);
+        }
+        return result;
     }
 }

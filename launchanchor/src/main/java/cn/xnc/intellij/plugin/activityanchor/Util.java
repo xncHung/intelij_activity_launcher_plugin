@@ -10,16 +10,7 @@ import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
 
 
-public class Util {
-    public static boolean isArray(String value) {
-        try {
-            JsonElement parse = new JsonParser().parse(value);
-            return parse.isJsonArray();
-        } catch (JsonSyntaxException e) {
-            return false;
-        }
-    }
-
+class Util {
     static boolean checkSerializable(Class<?> aClass) {
         Class<?>[] interfaces = aClass.getInterfaces();
         for (Class item : interfaces) {
@@ -28,7 +19,7 @@ public class Util {
         return false;
     }
 
-    public static boolean checkParcelable(Class realType) {
+    static boolean checkParcelable(Class realType) {
         Class<?>[] interfaces = realType.getInterfaces();
         for (Class item : interfaces) {
             if (item.equals(Parcelable.class)) return true;
