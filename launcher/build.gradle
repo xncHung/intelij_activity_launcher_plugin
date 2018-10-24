@@ -20,15 +20,27 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+
 intellij {
     updateSinceUntilBuild false
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'androidActivityLauncher'
     plugins 'android'
     systemProperty 'idea.is.internal', 'false'
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            print(details.requested.version + "#############################")
+            if (details.requested.group == 'com.jetbrains') {
+                details.useVersion '183-EAP-SNAPSHOT'
+                details.because 'the zip is too big'
+            }
+
+        }
+    }
 }
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
 }
+

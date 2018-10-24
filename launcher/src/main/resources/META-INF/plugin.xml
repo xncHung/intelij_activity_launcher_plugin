@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>cn.xnd.plugins.androidActLauncher</id>
+    <id>io.xnd.plugins.androidActLauncher</id>
     <name>ActivityLauncher</name>
     <vendor email="xjpnull@gmail.com">xnd</vendor>
 
@@ -18,13 +18,13 @@
         <toolWindow id="ActivityLauncher"
                     anchor="right"
                     secondary="true"
-                    factoryClass="cn.xjp.plugins.android_act_launcher.ActivityLauncher"
+                    factoryClass="io.xnc.plugins.android_act_launcher.ActivityLauncher"
         >
 
 
         </toolWindow>
-        <projectService serviceInterface="cn.xjp.plugins.android_act_launcher.storage.RuleConfigService"
-                        serviceImplementation="cn.xjp.plugins.android_act_launcher.storage.RuleConfigService"/>
+        <projectService serviceInterface="io.xnc.plugins.android_act_launcher.storage.RuleConfigService"
+                        serviceImplementation="io.xnc.plugins.android_act_launcher.storage.RuleConfigService"/>
         <!-- Add your extensions here -->
     </extensions>
 
@@ -36,27 +36,27 @@
                class="com.intellij.openapi.actionSystem.DefaultActionGroup">
             <action id="ActivityLauncher.StartAction"
                     icon="/icons/run.png"
-                    class="cn.xjp.plugins.android_act_launcher.actions.StartAction"
+                    class="io.xnc.plugins.android_act_launcher.actions.StartAction"
                     text="StartActivity"/>
             <action id="ActivityLauncher.DebugAction"
                     icon="/icons/debug.png"
-                    class="cn.xjp.plugins.android_act_launcher.actions.DebugAction"
+                    class="io.xnc.plugins.android_act_launcher.actions.DebugAction"
                     text="DebugActivity"/>
         </group>
         <group id="ActivityLauncher.Rule.ToolBar"
                class="com.intellij.openapi.actionSystem.DefaultActionGroup">
             <action id="ActivityLauncher.ACTIONS.AddNewRuleAction"
                     icon="/icons/add.svg"
-                    class="cn.xjp.plugins.android_act_launcher.actions.AddNewRuleAction" text="AddNewRule"/>
+                    class="io.xnc.plugins.android_act_launcher.actions.AddNewRuleAction" text="AddNewRule"/>
             <action id="ActivityLauncher.ACTIONS.RemoveRuleAction"
                     icon="/icons/remove.svg"
-                    class="cn.xjp.plugins.android_act_launcher.actions.RemoveRuleAction" text="RemoveRule"/>
+                    class="io.xnc.plugins.android_act_launcher.actions.RemoveRuleAction" text="RemoveRule"/>
             <action id="ActivityLauncher.ACTIONS.EditRuleAction"
                     icon="/icons/edit.svg"
-                    class="cn.xjp.plugins.android_act_launcher.actions.EditRuleAction" text="EditRule"/>
+                    class="io.xnc.plugins.android_act_launcher.actions.EditRuleAction" text="EditRule"/>
             <action id="ActivityLauncher.ACTIONS.ReLoadAction"
                     icon="/icons/refresh.svg"
-                    class="cn.xjp.plugins.android_act_launcher.actions.ReLoadAction" text="Reload"/>
+                    class="io.xnc.plugins.android_act_launcher.actions.ReLoadAction" text="Reload"/>
         </group>
 
     </actions>

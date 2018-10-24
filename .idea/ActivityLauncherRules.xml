@@ -6,14 +6,14 @@
       <list>
         <Rule>
           <option name="name" value="test1" />
-          <option name="target" value="cn.xnc.intellij.plugin.activityanchor.sample.MainActivity" />
+          <option name="target" value="io.xnc.intellij.plugin.activityanchor.sample.MainActivity" />
           <option name="params">
             <list />
           </option>
         </Rule>
         <Rule>
           <option name="name" value="test" />
-          <option name="target" value="cn.xnc.intellij.plugin.activityanchor.sample.Main2Activity" />
+          <option name="target" value="io.xnc.intellij.plugin.activityanchor.sample.Main2Activity" />
           <option name="params">
             <list>
               <IntentParam>
@@ -41,14 +41,14 @@
                 <option name="isActive" value="true" />
                 <option name="key" value="testParc" />
                 <option name="type" value="Parcelable or Parcelable array" />
-                <option name="realType" value="cn.xnc.intellij.plugin.activityanchor.sample.bean.TestBean" />
+                <option name="realType" value="io.xnc.intellij.plugin.activityanchor.sample.bean.TestBean" />
                 <option name="value" value="{name:&quot;xiaoming&quot;,age:18,desc:&quot;goodBoy!&quot;}" />
               </IntentParam>
               <IntentParam>
                 <option name="isActive" value="true" />
                 <option name="key" value="testSeri" />
                 <option name="type" value="Serializable" />
-                <option name="realType" value="cn.xnc.intellij.plugin.activityanchor.sample.bean.TestSeri" />
+                <option name="realType" value="io.xnc.intellij.plugin.activityanchor.sample.bean.TestSeri" />
                 <option name="value" value="{rawId:100,testInt:67,testBoolean:false}" />
               </IntentParam>
             </list>
