@@ -12,7 +12,7 @@ public class Bridge {
         AndroidDebugBridge debugBridge = AndroidSdkUtils.getDebugBridge(project);
         if (debugBridge != null) {
             IDevice[] devices = debugBridge.getDevices();
-            return devices ==null?new IDevice[0]: devices;
+            return devices == null ? new IDevice[0] : devices;
         }
         return new IDevice[0];
     }

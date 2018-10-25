@@ -26,17 +26,8 @@ intellij {
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'androidActivityLauncher'
     plugins 'android'
+    version '172.4343'
     systemProperty 'idea.is.internal', 'false'
-    configurations.all {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-            print(details.requested.version + "#############################")
-            if (details.requested.group == 'com.jetbrains') {
-                details.useVersion '183-EAP-SNAPSHOT'
-                details.because 'the zip is too big'
-            }
-
-        }
-    }
 }
 patchPluginXml {
     changeNotes """

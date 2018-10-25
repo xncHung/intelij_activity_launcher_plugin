@@ -12,7 +12,7 @@ public class ReLoadAction extends BaseAction {
         if (project == null) {
             return;
         }
-        activityLauncher.refreshData(project);
+        activityLauncher.reload();
     }
 
 

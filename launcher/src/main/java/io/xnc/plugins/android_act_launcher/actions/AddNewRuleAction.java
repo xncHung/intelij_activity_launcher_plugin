@@ -16,7 +16,6 @@ public class AddNewRuleAction extends BaseAction {
         ActivityLauncher activityLauncher = getActivityLauncher(e);
         e.getPresentation().setEnabled(
                 activityLauncher != null
-                        && activityLauncher.getSelectedRule() != null
                         && activityLauncher.getSelectedModule() != null
         );
     }

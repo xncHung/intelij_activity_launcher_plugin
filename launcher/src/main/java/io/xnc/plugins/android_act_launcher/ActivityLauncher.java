@@ -1,5 +1,8 @@
 package io.xnc.plugins.android_act_launcher;
 
+import com.android.ddmlib.AndroidDebugBridge;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.StringUtil;
 import io.xnc.plugins.android_act_launcher.adb.Bridge;
 import io.xnc.plugins.android_act_launcher.rule.RemoveRuleDialog;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
@@ -16,11 +19,11 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import org.jetbrains.android.sdk.AndroidSdkUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -31,7 +34,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class ActivityLauncher extends JPanel implements ToolWindowFactory, GradleSyncListener {
+public class ActivityLauncher extends JPanel implements GradleSyncListener {
 
     public static final String ID = "ActivityLauncher";
     private JPanel launcherWindowContent;
@@ -47,17 +50,17 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
     private DefaultListModel<Rule> listModel;
     private RuleConfigService configService;
     private DefaultComboBoxModel<Module> moduleModel;
-
+    private Project project;
+    Logger logger = Logger.getInstance(ActivityLauncher.class);
     public ActivityLauncher() {
         super(new BorderLayout());
     }
 
 
-    // Create the tool window content.
-    @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         moduleManager = ModuleManager.getInstance(project);
         configService = RuleConfigService.getInstance(project);
+        this.project = project;
         add(launcherWindowContent, BorderLayout.CENTER);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", false);
@@ -84,7 +87,6 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         initRunActionBar();
 
         GradleSyncState.subscribe(project, this);
-        refreshData(project);
     }
 
     private void initRunActionBar() {
@@ -95,6 +97,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         JComponent component = actionToolbar.getComponent();
         FlowLayout flowLayout = new FlowLayout(FlowLayout.LEFT);
         flowLayout.setHgap(5);
+        runActionContainer.removeAll();
         runActionContainer.add(component, flowLayout);
     }
 
@@ -106,6 +109,7 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         JComponent component = actionToolbar.getComponent();
         FlowLayout flowLayout = new FlowLayout(FlowLayout.LEFT);
         flowLayout.setHgap(5);
+        runActionContainer.removeAll();
         ruleActionContainer.add(component, flowLayout);
     }
 
@@ -136,24 +140,47 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
             }
 
         });
-    }
-
-    private void initListeners() {
-        moduleBox.addItemListener(new ItemListener() {
+        variantBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                Object item = e.getItem();
-                if (item instanceof Module) {
-                    Module module = (Module) item;
-                    refreshVariantBox(module);
+                Module selectedModule = getSelectedModule();
+                String selectedVariant = getSelectedVariant();
+                if (selectedModule != null && !StringUtil.isEmpty(selectedVariant)) {
+                    configService.selectedModule = selectedModule.getName();
+                    configService.selectedVariantMap.put(selectedModule.getName(), selectedVariant);
                 }
             }
         });
+    }
+
+    private void initListeners() {
 
         cbClearData.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 configService.clearData = cbClearData.isSelected();
+            }
+        });
+        AndroidDebugBridge.addDeviceChangeListener(new AndroidDebugBridge.IDeviceChangeListener() {
+            @Override
+            public void deviceConnected(IDevice iDevice) {
+                updateDeviceBox();
+            }
+
+            @Override
+            public void deviceDisconnected(IDevice iDevice) {
+                updateDeviceBox();
+            }
+
+            @Override
+            public void deviceChanged(IDevice iDevice, int i) {
+                updateDeviceBox();
+            }
+        });
+        AndroidDebugBridge.addDebugBridgeChangeListener(new AndroidDebugBridge.IDebugBridgeChangeListener() {
+            @Override
+            public void bridgeChanged(AndroidDebugBridge androidDebugBridge) {
+                updateDeviceBox();
             }
         });
     }
@@ -179,16 +206,15 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
             Collection<String> variantNames = androidModuleModel.getVariantNames();
             DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(new Vector<>(variantNames));
             variantBox.setModel(model);
-            if (model.getSize() > 0) {
-                variantBox.setSelectedIndex(0);
+            String s = configService.selectedVariantMap.get(module.getName());
+            int indexOf = model.getIndexOf(s);
+            if (indexOf >= 0) {
+                variantBox.setSelectedIndex(indexOf);
             }
         }
     }
 
-    public void refreshData(@NotNull Project project) {
-        IDevice[] deviceList = Bridge.getDeviceList(project);
-        devicesBox.setModel(new DefaultComboBoxModel<>(deviceList));
-
+    public void refreshData() {
         Module[] modules = moduleManager.getModules();
         Vector<Module> apps = new Vector<>();
         for (Module module : modules) {
@@ -197,11 +223,41 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
                 apps.add(module);
             }
         }
+        if (apps.isEmpty()) return;
         moduleModel = new DefaultComboBoxModel<>(apps);
         moduleBox.setModel(moduleModel);
-        if (moduleModel.getSize() >= 1) {
-            moduleBox.setSelectedIndex(0);
-            refreshVariantBox(moduleModel.getElementAt(0));
+        String selectedModule = configService.selectedModule;
+        Module element = null;
+        if (StringUtil.isEmpty(selectedModule)) {
+            element = moduleModel.getElementAt(0);
+            moduleModel.setSelectedItem(element);
+        } else {
+            for (int index = 0; index < moduleModel.getSize(); index++) {
+                element = moduleModel.getElementAt(index);
+                if (element != null && selectedModule.equals(element.getName())) {
+                    moduleModel.setSelectedItem(element);
+                    break;
+                }
+            }
+        }
+        if (element != null) {
+            refreshVariantBox(element);
+        }
+    }
+
+    private void updateDeviceBox() {
+        IDevice[] deviceList = Bridge.getDeviceList(project);
+        DefaultComboBoxModel<IDevice> model = new DefaultComboBoxModel<>(deviceList);
+        devicesBox.setModel(model);
+        String selectedDeviceId = configService.selectedDeviceId;
+        if (!StringUtil.isEmpty(selectedDeviceId)) {
+            for (int index = 0; index < model.getSize(); index++) {
+                IDevice device = model.getElementAt(index);
+                if (selectedDeviceId.equals(device.getSerialNumber())) {
+                    model.setSelectedItem(device);
+                    break;
+                }
+            }
         }
     }
 
@@ -212,22 +268,48 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
                 setText(value == null ? "No App Module Found" : value.getName());
             }
         });
+        moduleBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Object item = e.getItem();
+                if (item instanceof Module) {
+                    Module module = (Module) item;
+                    configService.selectedModule = module.getName();
+                    refreshVariantBox(module);
+                }
+            }
+        });
     }
 
     private void initDeviceBox() {
-
+        devicesBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logger.error("devices");
+                ComboBoxModel<IDevice> model = devicesBox.getModel();
+                if (model == null || model.getSize() == 0) {
+                    updateDeviceBox();
+                }
+            }
+        });
         devicesBox.setRenderer(new ListCellRendererWrapper<IDevice>() {
             @Override
             public void customize(JList list, IDevice value, int index, boolean selected, boolean hasFocus) {
                 setText(value == null ? "No Device Found" : value.getName());
             }
         });
+        devicesBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Object item = e.getItem();
+                if (e instanceof IDevice) {
+                    IDevice device = (IDevice) item;
+                    configService.selectedDeviceId = device.getSerialNumber();
+                }
+            }
+        });
     }
 
-    @Override
-    public boolean shouldBeAvailable(@NotNull Project project) {
-        return true;
-    }
 
     @Override
     public void syncStarted(@NotNull Project project, boolean b, boolean b1) {
@@ -241,15 +323,18 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
 
     @Override
     public void syncSucceeded(@NotNull Project project) {
-        refreshData(project);
+        refreshData();
     }
 
     @Override
     public void syncFailed(@NotNull Project project, @NotNull String s) {
+        refreshData();
+
     }
 
     @Override
     public void syncSkipped(@NotNull Project project) {
+        refreshData();
 
     }
 
@@ -349,4 +434,8 @@ public class ActivityLauncher extends JPanel implements ToolWindowFactory, Gradl
         return null;
     }
 
+    public void reload() {
+        updateDeviceBox();
+        refreshData();
+    }
 }

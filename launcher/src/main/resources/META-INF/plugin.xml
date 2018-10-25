@@ -18,7 +18,7 @@
         <toolWindow id="ActivityLauncher"
                     anchor="right"
                     secondary="true"
-                    factoryClass="io.xnc.plugins.android_act_launcher.ActivityLauncher"
+                    factoryClass="io.xnc.plugins.android_act_launcher.LauncherFactory"
         >
 
 
