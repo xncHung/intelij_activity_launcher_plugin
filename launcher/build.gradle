@@ -26,7 +26,7 @@ intellij {
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'androidActivityLauncher'
     plugins 'android'
-    version '172.4343'
+    version '2017.2.5'
     systemProperty 'idea.is.internal', 'false'
 }
 patchPluginXml {
