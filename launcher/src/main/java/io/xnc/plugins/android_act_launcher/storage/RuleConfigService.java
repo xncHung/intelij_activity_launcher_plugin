@@ -21,7 +21,7 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
     public boolean clearData;
     public String selectedDeviceId = "";
     public String selectedModule = "";
-    public HashMap<String, String> selectedVariantMap = new HashMap<>();
+    public HashMap<String, String> selectedProductVariantMap = new HashMap<>();
 
     @Nullable
     @Override
@@ -32,7 +32,7 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
         addField2Config(config, "selectedDeviceId", selectedDeviceId);
         addField2Config(config, "selectedModule", selectedModule);
 
-        addMap2Config(config, "selectedVariantMap", this.selectedVariantMap);
+        addMap2Config(config, "selectedProductVariantMap", this.selectedProductVariantMap);
 
         Element option_rules = new Element("option");
         option_rules.setAttribute("name", "rules");
@@ -100,11 +100,11 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
                         rules.add(Rule.fromXml(ruleItem));
                     }
                     break;
-                case "selectedVariantMap":
+                case "selectedProductVariantMap":
                     Element map = item.getChild("map");
                     List<Element> entrys = map.getChildren("entry");
                     for (Element element : entrys) {
-                        selectedVariantMap.put(element.getAttributeValue("key"), element.getAttributeValue("value"));
+                        selectedProductVariantMap.put(element.getAttributeValue("key"), element.getAttributeValue("value"));
                     }
                     break;
             }

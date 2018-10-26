@@ -2,6 +2,7 @@ package io.xnc.intellij.plugin.activityanchor;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -27,6 +28,12 @@ public class Anchor extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        if (!isDebuggable) {
+            Log.e(TAG, "Not debuggable BuildType , you may not declare the dependency with debugRuntimeOnly ");
+            finish();
+            return;
+        }
         gson = new Gson();
         String target_activity = getIntent().getStringExtra(TARGET_ACTIVITY);
         String params = getIntent().getStringExtra(PARAMS_ARRAY);

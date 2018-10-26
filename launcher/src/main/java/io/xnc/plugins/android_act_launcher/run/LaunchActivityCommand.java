@@ -1,5 +1,9 @@
 package io.xnc.plugins.android_act_launcher.run;
 
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.ProductFlavor;
+import com.android.builder.model.ProductFlavorContainer;
+import com.android.builder.model.Variant;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
 import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
@@ -23,7 +27,7 @@ public class LaunchActivityCommand implements Command {
 
 
     @Override
-    public boolean apply(Project project, IDevice device, Module module) {
+    public boolean apply(Project project, IDevice device, Module module, String variantName) {
         AndroidModuleModel model = AndroidModuleModel.get(module);
         if (model == null) {
             error("Not Android Module!");
@@ -33,7 +37,13 @@ public class LaunchActivityCommand implements Command {
             error("can't connect Device");
             return false;
         }
-        String applicationId = model.getApplicationId();
+        Variant variant = model.findVariantByName(variantName);
+        if (variant == null || variant.getMainArtifact() == null) {
+            error("error Variant");
+            return false;
+        }
+        AndroidArtifact artifact = variant.getMainArtifact();
+        String applicationId = artifact.getApplicationId();
         try {
             ShellReceiver receiver = new ShellReceiver();
             if (clearData) {

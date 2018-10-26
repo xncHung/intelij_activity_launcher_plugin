@@ -1,5 +1,8 @@
 package io.xnc.plugins.android_act_launcher;
 
+import com.android.builder.model.BuildType;
+import com.android.builder.model.BuildTypeContainer;
+import com.android.builder.model.Variant;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
@@ -149,7 +152,16 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
                 String selectedVariant = getSelectedVariant();
                 if (selectedModule != null && !StringUtil.isEmpty(selectedVariant)) {
                     configService.selectedModule = selectedModule.getName();
-                    configService.selectedVariantMap.put(selectedModule.getName(), selectedVariant);
+                    configService.selectedProductVariantMap.put(selectedModule.getName(), selectedVariant);
+                }
+            }
+        });
+        variantBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                ComboBoxModel<String> model = variantBox.getModel();
+                if (model == null || model.getSize() == 0) {
+                    refreshData();
                 }
             }
         });
@@ -206,9 +218,21 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         AndroidModuleModel androidModuleModel = AndroidModuleModel.get(module);
         if (androidModuleModel != null) {
             Collection<String> variantNames = androidModuleModel.getVariantNames();
-            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(new Vector<>(variantNames));
+            Vector<String> data = new Vector<>();
+            for (String name : variantNames) {
+                Variant variant = androidModuleModel.findVariantByName(name);
+                if (variant != null) {
+                    BuildTypeContainer buildTypeContainer = androidModuleModel.findBuildType(variant.getBuildType());
+                    if (buildTypeContainer != null
+                            && buildTypeContainer.getBuildType() != null
+                            && buildTypeContainer.getBuildType().isDebuggable()) {
+                        data.add(name);
+                    }
+                }
+            }
+            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(data);
             variantBox.setModel(model);
-            String s = configService.selectedVariantMap.get(module.getName());
+            String s = configService.selectedProductVariantMap.get(module.getName());
             int indexOf = model.getIndexOf(s);
             if (indexOf >= 0) {
                 variantBox.setSelectedIndex(indexOf);
@@ -282,6 +306,15 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
                     Module module = (Module) item;
                     configService.selectedModule = module.getName();
                     refreshVariantBox(module);
+                }
+            }
+        });
+        moduleBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                ComboBoxModel<Module> model = moduleBox.getModel();
+                if (model == null || model.getSize() == 0) {
+                    refreshData();
                 }
             }
         });
@@ -390,14 +423,18 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
             showError("no Module selected!");
             return;
         }
+        Module module = (Module) boxSelectedItem;
+        Object selectedVariant = variantBox.getSelectedItem();
+        if (selectedVariant == null || StringUtil.isEmpty(selectedVariant.toString())) {
+            showError("no Module selected!");
+            return;
+        }
         Rule selectedRule = getSelectedRule();
         if (selectedRule == null) {
             showError("select a target to launch");
         }
         IDevice device = (IDevice) selectedItem;
-        Module module = (Module) boxSelectedItem;
-
-        new LaunchActivityCommand(selectedRule, debug, cbClearData.isSelected()).apply(project, device, module);
+        new LaunchActivityCommand(selectedRule, debug, cbClearData.isSelected()).apply(project, device, module, selectedVariant.toString());
     }
 
     private void showError(String msg) {

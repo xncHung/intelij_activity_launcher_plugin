@@ -36,7 +36,7 @@ dependencies {
 def siteUrl = 'https://github.com/xncHung/intelij_activity_launcher_plugin'      // Homepage URL of the library
 def gitUrl = 'https://github.com/xncHung/intelij_activity_launcher_plugin.git'   // Git repository URL
 group = "io.xnc.intellij.plugin"                                          // Maven Group ID for the artifact
-version = '1.0.1'
+version = '1.0.2'
 install {
     repositories.mavenInstaller {
         pom.project {
