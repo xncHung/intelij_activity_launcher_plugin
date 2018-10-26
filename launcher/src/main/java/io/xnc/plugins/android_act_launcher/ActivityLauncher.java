@@ -3,6 +3,7 @@ package io.xnc.plugins.android_act_launcher;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.PopupMenuListenerAdapter;
 import io.xnc.plugins.android_act_launcher.adb.Bridge;
 import io.xnc.plugins.android_act_launcher.rule.RemoveRuleDialog;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
@@ -23,13 +24,13 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import org.jetbrains.android.sdk.AndroidSdkUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -51,13 +52,14 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     private RuleConfigService configService;
     private DefaultComboBoxModel<Module> moduleModel;
     private Project project;
-    Logger logger = Logger.getInstance(ActivityLauncher.class);
+    private Logger logger = Logger.getInstance(ActivityLauncher.class);
+
     public ActivityLauncher() {
         super(new BorderLayout());
     }
 
 
-    public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+    void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         moduleManager = ModuleManager.getInstance(project);
         configService = RuleConfigService.getInstance(project);
         this.project = project;
@@ -214,7 +216,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         }
     }
 
-    public void refreshData() {
+    private void refreshData() {
         Module[] modules = moduleManager.getModules();
         Vector<Module> apps = new Vector<>();
         for (Module module : modules) {
@@ -259,6 +261,10 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
                 }
             }
         }
+        IDevice item = (IDevice) devicesBox.getSelectedItem();
+        if (item != null) {
+            configService.selectedDeviceId = item.getSerialNumber();
+        }
     }
 
     private void initModuleBox() {
@@ -282,10 +288,9 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     }
 
     private void initDeviceBox() {
-        devicesBox.addActionListener(new ActionListener() {
+        devicesBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                logger.error("devices");
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
                 ComboBoxModel<IDevice> model = devicesBox.getModel();
                 if (model == null || model.getSize() == 0) {
                     updateDeviceBox();
@@ -302,7 +307,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Object item = e.getItem();
-                if (e instanceof IDevice) {
+                if (item instanceof IDevice) {
                     IDevice device = (IDevice) item;
                     configService.selectedDeviceId = device.getSerialNumber();
                 }

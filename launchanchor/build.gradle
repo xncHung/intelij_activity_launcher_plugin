@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'nebula.optional-base'
 
 android {
     compileSdkVersion 26
@@ -28,8 +29,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation ("com.google.code.gson:gson:2.8.5") {
-    }
+    implementation "com.google.code.gson:gson:2.8.5", optional
+
 }
 
 def siteUrl = 'https://github.com/xncHung/intelij_activity_launcher_plugin'      // Homepage URL of the library
@@ -113,3 +114,5 @@ bintray {
 //        }
     }
 }
+
+

@@ -62,7 +62,7 @@ public class Rule {
 
     @Override
     public String toString() {
-        return name + "------>( " + target + ") -- [ " + (params == null || params.isEmpty() ? "no param" : ("with " + getActiveParamCount() + " params")) + " ]";
+        return name + "--->( " + target + ") -- [ " + (params == null || params.isEmpty() ? "no param" : ("with " + getActiveParamCount() + " params")) + " ]";
     }
 
     private int getActiveParamCount() {
