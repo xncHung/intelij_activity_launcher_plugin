@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumnModel;
 import java.awt.event.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -128,8 +129,13 @@ public class AddOrModifyRuleDialog extends DialogWrapper {
         dataModel = new ParamItemModel();
         paramTable.setModel(dataModel);
         ComboBox<String> comboBox = new ComboBox<>(new DefaultComboBoxModel<>(IntentParam.TYPE_NAMES));
-        paramTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(comboBox));
-        paramTable.setRowHeight(30);
+        TableColumnModel columnModel = paramTable.getColumnModel();
+        columnModel.getColumn(2).setCellEditor(new DefaultCellEditor(comboBox));
+        paramTable.setRowHeight(25);
+        columnModel.getColumn(0).setMaxWidth(60);
+        columnModel.getColumn(1).setMaxWidth(120);
+        columnModel.getColumn(2).setMaxWidth(180);
+        columnModel.getColumn(3).setMaxWidth(400);
     }
 
     @Override

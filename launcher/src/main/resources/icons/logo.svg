@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="7"
+            fill="none"
+            stroke-width="1.5"
+            stroke="#8e8e8e"
+    />
+    <circle cx="8" cy="8" r="4"
+            fill="none"
+            stroke-width="1"
+            stroke="#8e8e8e"
+    />
+    <circle cx="8" cy="8" r="1"
+            fill="#8e8e8e"
+    />
+    <line
+            x1="8" y1="8" x2="14.6" y2="1.4"
+            stroke="#8e8e8e"
+            stroke-width="1"
+    />
+    <polygon
+    points="13.6454,1.6464  13.988,0.7063 14.6943,0 14.21638,1.78361 16,1.3057 15.2937,2.012  14.3636,2.3536 13.64,1.6464 "
+    fill="#8e8e8e"
+    />
+</svg>
+

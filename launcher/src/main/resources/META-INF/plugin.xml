@@ -18,6 +18,7 @@
         <toolWindow id="ActivityLauncher"
                     anchor="right"
                     secondary="true"
+                    icon="/icons/logo.svg"
                     factoryClass="io.xnc.plugins.android_act_launcher.LauncherFactory"
         >
 

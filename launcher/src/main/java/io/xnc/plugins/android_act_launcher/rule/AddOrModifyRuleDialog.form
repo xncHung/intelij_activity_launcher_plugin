@@ -129,8 +129,9 @@
               <font size="12"/>
               <inheritsPopupMenu value="false"/>
               <intercellSpacing width="3" height="3"/>
-              <rowHeight value="40"/>
+              <rowHeight value="30"/>
               <rowMargin value="3"/>
+              <rowSelectionAllowed value="true"/>
               <showHorizontalLines value="true"/>
               <showVerticalLines value="true"/>
               <surrendersFocusOnKeystroke value="true"/>
