@@ -1,32 +1,39 @@
 <idea-plugin>
-    <id>io.xnd.plugins.androidActLauncher</id>
+    <id>io.xnc.plugins.androidActLauncher</id>
     <name>ActivityLauncher</name>
-    <vendor email="xjpnull@gmail.com">xnd</vendor>
+    <vendor email="xjpnull@gmail.com">xnc</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    <p><em>Android debug activity launcher that you can launch any activity with params</em></p>
+
+<p>ActivityLauncher is an android debug plugin for intellij idea which you can launch or debug any activity <b>directly</b> with it,
+</p>
+<p> you also can pass any primitive 、non-parameterized parcelable or serializable args to an activity.
+</p>
+<h3 id="guide">UseGuide</h3>
+<ul>
+    <li>in your app build.gradle file , add the anchor lib dependency with debugRuntimeOnly, like this:
+        <p>debugRuntimeOnly 'io.xnc.intellij.plugin:launchanchor:1.0.2'</p>
+    </li>
+    <li>
+        sync the gradle and install debug variant on your debug device
+    </li>
+    <li>
+        configure the activity route that you want launch.Enjoy your debugging!
+    </li>
+</ul>
     ]]></description>
-
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
-
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ActivityLauncher"
                     anchor="right"
                     secondary="true"
                     icon="/icons/logo.svg"
-                    factoryClass="io.xnc.plugins.android_act_launcher.LauncherFactory"
-        >
+                    factoryClass="io.xnc.plugins.android_act_launcher.LauncherFactory">
 
 
         </toolWindow>
         <projectService serviceInterface="io.xnc.plugins.android_act_launcher.storage.RuleConfigService"
                         serviceImplementation="io.xnc.plugins.android_act_launcher.storage.RuleConfigService"/>
-        <!-- Add your extensions here -->
     </extensions>
 
     <idea-version since-build="173"/>

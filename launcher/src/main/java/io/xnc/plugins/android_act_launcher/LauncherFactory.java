@@ -10,9 +10,4 @@ public class LauncherFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         new ActivityLauncher().createToolWindowContent(project, toolWindow);
     }
-
-    @Override
-    public boolean shouldBeAvailable(@NotNull Project project) {
-        return true;
-    }
 }
