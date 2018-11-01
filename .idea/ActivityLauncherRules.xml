@@ -12,7 +12,7 @@
     <option name="rules">
       <list>
         <Rule>
-          <option name="name" value="test1" />
+          <option name="name" value="test" />
           <option name="target" value="io.xnc.intellij.plugin.activityanchor.sample.MainActivity" />
           <option name="params">
             <list />
