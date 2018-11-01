@@ -1,10 +1,10 @@
-#activity debug launcher
-##Future
+# activity debug launcher
+## Future
 * start/debug any activity directly 
 * support pass params
 * friendlly,you only need to dependency a lib with **debugRuntimeOnly** and install a plugin 
 
-##How to use
+## How to use
 * install this plugin:ActivityLauncher
 * in your app build.gradle file , add the anchor lib dependency with debugRuntimeOnly, like this:
 debugRuntimeOnly 
