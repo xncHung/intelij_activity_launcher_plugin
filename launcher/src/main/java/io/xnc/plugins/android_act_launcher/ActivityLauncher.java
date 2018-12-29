@@ -1,6 +1,5 @@
 package io.xnc.plugins.android_act_launcher;
 
-import com.android.builder.model.BuildType;
 import com.android.builder.model.BuildTypeContainer;
 import com.android.builder.model.Variant;
 import com.android.ddmlib.AndroidDebugBridge;
@@ -27,6 +26,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import javafx.scene.control.Cell;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -56,6 +56,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     private DefaultComboBoxModel<Module> moduleModel;
     private Project project;
     private Logger logger = Logger.getInstance(ActivityLauncher.class);
+    private JCheckBox cbStopApp;
 
     public ActivityLauncher() {
         super(new BorderLayout());
@@ -70,16 +71,6 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", false);
         toolWindow.getContentManager().addContent(content);
-//        new FocusWatcher() {
-//            @Override
-//            protected void focusedComponentChanged(Component component, @Nullable AWTEvent cause) {
-//                super.focusedComponentChanged(component, cause);
-//                if (component != null && SwingUtilities.isDescendingFrom(component, toolWindow.getComponent())) {
-//                    refreshData(project);
-//                }
-//
-//            }
-//        }.install(toolWindow.getComponent());
         errorTip.setForeground(JBColor.RED);
         initDeviceBox();
         initModuleBox();
@@ -434,7 +425,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
             showError("select a target to launch");
         }
         IDevice device = (IDevice) selectedItem;
-        new LaunchActivityCommand(selectedRule, debug, cbClearData.isSelected()).apply(project, device, module, selectedVariant.toString());
+        new LaunchActivityCommand(selectedRule, debug, cbClearData.isSelected(), cbStopApp.isSelected()).apply(project, device, module, selectedVariant.toString());
     }
 
     private void showError(String msg) {

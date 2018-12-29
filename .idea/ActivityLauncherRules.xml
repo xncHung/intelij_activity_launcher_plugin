@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ActivityLauncherRules">
     <option name="clearData" value="false" />
-    <option name="selectedDeviceId" value="192.168.116.101:5555" />
+    <option name="selectedDeviceId" value="192.168.56.101:5555" />
     <option name="selectedModule" value="sample" />
-    <option name="selectedProductVariantMap">
+    <option name="selectedVariantMap">
       <map>
         <entry key="sample" value="betaDebug" />
       </map>

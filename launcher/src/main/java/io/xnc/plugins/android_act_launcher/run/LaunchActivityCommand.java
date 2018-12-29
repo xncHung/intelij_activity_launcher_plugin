@@ -1,8 +1,6 @@
 package io.xnc.plugins.android_act_launcher.run;
 
 import com.android.builder.model.AndroidArtifact;
-import com.android.builder.model.ProductFlavor;
-import com.android.builder.model.ProductFlavorContainer;
 import com.android.builder.model.Variant;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
 import com.android.ddmlib.IDevice;
@@ -18,11 +16,13 @@ public class LaunchActivityCommand implements Command {
     private final Rule rule;
     private final boolean debug;
     private final boolean clearData;
+    private final boolean stopApp;
 
-    public LaunchActivityCommand(Rule rule, boolean debug, boolean clearData) {
+    public LaunchActivityCommand(Rule rule, boolean debug, boolean clearData, boolean stopApp) {
         this.debug = debug;
         this.clearData = clearData;
         this.rule = rule;
+        this.stopApp = stopApp;
     }
 
 
@@ -55,7 +55,7 @@ public class LaunchActivityCommand implements Command {
                     error(rule.getName() + " Clear Data Error!" + clearShellOutputReceiver.getErrorMsg());
                 }
             }
-            device.executeShellCommand(ShellCmdFactory.createActivityLaunchShellCmd(applicationId, rule, debug), receiver, 15, TimeUnit.SECONDS);
+            device.executeShellCommand(ShellCmdFactory.createActivityLaunchShellCmd(applicationId, rule, debug, stopApp), receiver, 15, TimeUnit.SECONDS);
             if (debug) {
                 DebugUtil.attachDebugger(project, device, applicationId);
             }
