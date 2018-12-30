@@ -8,7 +8,7 @@ import java.util.List;
 
 public class IntentParam {
     static final String[] COLUMN_NAMES = new String[]{"active", "Key", "Type", "RealTypePath", "JsonOfValue"};
-    static final String[] TYPE_NAMES = new String[]{
+    public static final String[] TYPE_NAMES = new String[]{
             "String or String array",
             "int or int array",
             "Serializable",
@@ -32,10 +32,10 @@ public class IntentParam {
     private String value;
     private String realType = Constant.PRIMITIVE_OR_STRING;
 
-    IntentParam() {
+    public IntentParam() {
     }
 
-    IntentParam(boolean isActive, String key, String type, String realType, String value) {
+    public IntentParam(boolean isActive, String key, String type, String realType, String value) {
         this.isActive = isActive;
         this.key = key;
         this.type = type;
@@ -76,11 +76,12 @@ public class IntentParam {
         }
         return intentParam;
     }
-    Object[] toRowColumns() {
+
+    public Object[] toRowColumns() {
         return new Object[]{isActive, key, type, realType, value};
     }
 
-    public Element toXmlElement() {
+    Element toXmlElement() {
         Element intentParam = new Element("IntentParam");
 
         Element option_name = new Element("option");

@@ -63,7 +63,12 @@ public class LaunchActivityCommand implements Command {
                 info(rule.getName() + " Launch Success!");
                 return true;
             } else {
-                error(rule.getName() + " Launch Error!" + receiver.getErrorMsg());
+                if (receiver.getErrorType() == ShellReceiver.WARNING_CODE) {
+                    warning(receiver.getWarningMsg());
+                } else {
+                    error(rule.getName() + " Launch Error!" + receiver.getErrorMsg() + " please ensure your variant:" + variantName
+                            + " has installed and  have dependency the anchor lib with this gradle script: \ndebugRuntimeOnly 'io.xnc.intellij.plugin:launchanchor:1.0.2' ");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

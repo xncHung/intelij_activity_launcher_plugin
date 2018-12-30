@@ -16,7 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="io.xnc.intellij.plugin.activityanchor.sample.Main2Activity">
+        <activity android:name="io.xnc.intellij.plugin.activityanchor.sample.Main2Activity"
+                android:launchMode="singleTask"
+                >
         </activity>
     </application>
 

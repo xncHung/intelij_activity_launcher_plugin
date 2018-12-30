@@ -56,7 +56,7 @@ public class Rule {
         return target;
     }
 
-    List<IntentParam> getParams() {
+    public List<IntentParam> getParams() {
         return params;
     }
 
@@ -73,7 +73,7 @@ public class Rule {
         return count;
     }
 
-    void inject(Rule selectedRule) {
+    public void inject(Rule selectedRule) {
         selectedRule.name = this.name;
         selectedRule.target = this.target;
         selectedRule.params = this.params;

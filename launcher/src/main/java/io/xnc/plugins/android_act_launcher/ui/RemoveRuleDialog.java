@@ -1,4 +1,4 @@
-package io.xnc.plugins.android_act_launcher.rule;
+package io.xnc.plugins.android_act_launcher.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;

@@ -2,14 +2,12 @@ package io.xnc.plugins.android_act_launcher;
 
 import com.android.builder.model.BuildTypeContainer;
 import com.android.builder.model.Variant;
-import com.android.ddmlib.AndroidDebugBridge;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.PopupMenuListenerAdapter;
 import io.xnc.plugins.android_act_launcher.adb.Bridge;
-import io.xnc.plugins.android_act_launcher.rule.RemoveRuleDialog;
+import io.xnc.plugins.android_act_launcher.ui.RemoveRuleDialog;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
-import io.xnc.plugins.android_act_launcher.rule.AddOrModifyRuleDialog;
+import io.xnc.plugins.android_act_launcher.ui.AddOrModifyRuleDialog;
 import io.xnc.plugins.android_act_launcher.run.LaunchActivityCommand;
 import io.xnc.plugins.android_act_launcher.storage.RuleConfigService;
 import com.android.builder.model.AndroidProject;
@@ -26,13 +24,10 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import javafx.scene.control.Cell;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import java.awt.*;
 import java.awt.event.*;
@@ -55,7 +50,6 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     private RuleConfigService configService;
     private DefaultComboBoxModel<Module> moduleModel;
     private Project project;
-    private Logger logger = Logger.getInstance(ActivityLauncher.class);
     private JCheckBox cbStopApp;
 
     public ActivityLauncher() {
@@ -76,6 +70,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         initModuleBox();
         initVariantBox();
         initRouterList();
+        initGlobalCheckBox();
 
         initListeners();
 
@@ -95,6 +90,13 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         flowLayout.setHgap(5);
         runActionContainer.removeAll();
         runActionContainer.add(component, flowLayout);
+    }
+
+    public boolean hasReady() {
+        return getSelectedRule() != null
+                && getSelectedDevice() != null
+                && getSelectedModule() != null
+                && getSelectedVariant() != null;
     }
 
     private void initRuleActionBar() {
@@ -125,7 +127,21 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         for (Rule item : configService.rules) {
             listModel.addElement(item);
         }
+        rulesList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    if (hasReady()) {
+                        submitRun(project, false);
+                    }
+                }
+            }
+        });
+    }
+
+    private void initGlobalCheckBox() {
         cbClearData.setSelected(configService.clearData);
+        cbStopApp.setSelected(configService.stopApp);
     }
 
     private void initVariantBox() {
@@ -136,15 +152,12 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
             }
 
         });
-        variantBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Module selectedModule = getSelectedModule();
-                String selectedVariant = getSelectedVariant();
-                if (selectedModule != null && !StringUtil.isEmpty(selectedVariant)) {
-                    configService.selectedModule = selectedModule.getName();
-                    configService.selectedProductVariantMap.put(selectedModule.getName(), selectedVariant);
-                }
+        variantBox.addItemListener(e -> {
+            Module selectedModule = getSelectedModule();
+            String selectedVariant = getSelectedVariant();
+            if (selectedModule != null && !StringUtil.isEmpty(selectedVariant)) {
+                configService.selectedModule = selectedModule.getName();
+                configService.selectedProductVariantMap.put(selectedModule.getName(), selectedVariant);
             }
         });
         variantBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
@@ -160,34 +173,8 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
 
     private void initListeners() {
 
-        cbClearData.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                configService.clearData = cbClearData.isSelected();
-            }
-        });
-        AndroidDebugBridge.addDeviceChangeListener(new AndroidDebugBridge.IDeviceChangeListener() {
-            @Override
-            public void deviceConnected(IDevice iDevice) {
-                updateDeviceBox();
-            }
-
-            @Override
-            public void deviceDisconnected(IDevice iDevice) {
-                updateDeviceBox();
-            }
-
-            @Override
-            public void deviceChanged(IDevice iDevice, int i) {
-                updateDeviceBox();
-            }
-        });
-        AndroidDebugBridge.addDebugBridgeChangeListener(new AndroidDebugBridge.IDebugBridgeChangeListener() {
-            @Override
-            public void bridgeChanged(AndroidDebugBridge androidDebugBridge) {
-                updateDeviceBox();
-            }
-        });
+        cbClearData.addChangeListener(e -> configService.clearData = cbClearData.isSelected());
+        cbStopApp.addChangeListener(e -> configService.stopApp = cbStopApp.isSelected());
     }
 
     public void openAddRuleDialog(Project project) {
@@ -289,15 +276,12 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
                 setText(value == null ? "No App Module Found" : value.getName());
             }
         });
-        moduleBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Object item = e.getItem();
-                if (item instanceof Module) {
-                    Module module = (Module) item;
-                    configService.selectedModule = module.getName();
-                    refreshVariantBox(module);
-                }
+        moduleBox.addItemListener(e -> {
+            Object item = e.getItem();
+            if (item instanceof Module) {
+                Module module = (Module) item;
+                configService.selectedModule = module.getName();
+                refreshVariantBox(module);
             }
         });
         moduleBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
@@ -315,10 +299,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         devicesBox.addPopupMenuListener(new PopupMenuListenerAdapter() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                ComboBoxModel<IDevice> model = devicesBox.getModel();
-                if (model == null || model.getSize() == 0) {
-                    updateDeviceBox();
-                }
+                updateDeviceBox();
             }
         });
         devicesBox.setRenderer(new ListCellRendererWrapper<IDevice>() {
@@ -327,14 +308,11 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
                 setText(value == null ? "No Device Found" : value.getName());
             }
         });
-        devicesBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Object item = e.getItem();
-                if (item instanceof IDevice) {
-                    IDevice device = (IDevice) item;
-                    configService.selectedDeviceId = device.getSerialNumber();
-                }
+        devicesBox.addItemListener(e -> {
+            Object item = e.getItem();
+            if (item instanceof IDevice) {
+                IDevice device = (IDevice) item;
+                configService.selectedDeviceId = device.getSerialNumber();
             }
         });
     }
@@ -430,12 +408,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
 
     private void showError(String msg) {
         errorTip.setText(msg);
-        new Timer(2000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                errorTip.setText("");
-            }
-        }).start();
+        new Timer(2000, e -> errorTip.setText("")).start();
     }
 
     public Rule getSelectedRule() {

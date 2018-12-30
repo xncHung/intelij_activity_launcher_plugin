@@ -2,7 +2,7 @@
 ## Future
 * start/debug any activity directly 
 * support pass params
-* friendlly,you only need to dependency a lib with **debugRuntimeOnly** and install a plugin 
+* friendly,you only need to dependency a lib with **debugRuntimeOnly** and install a plugin
 
 ## How to use
 * install this plugin:ActivityLauncher

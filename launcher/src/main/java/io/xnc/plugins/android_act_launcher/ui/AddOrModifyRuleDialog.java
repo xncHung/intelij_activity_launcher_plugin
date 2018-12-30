@@ -1,4 +1,4 @@
-package io.xnc.plugins.android_act_launcher.rule;
+package io.xnc.plugins.android_act_launcher.ui;
 
 import android.os.Parcelable;
 import io.xnc.plugins.android_act_launcher.ActivityLauncher;
@@ -22,6 +22,10 @@ import com.intellij.psi.search.ProjectScope;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.LanguageTextField;
+import io.xnc.plugins.android_act_launcher.rule.Constant;
+import io.xnc.plugins.android_act_launcher.rule.IntentParam;
+import io.xnc.plugins.android_act_launcher.rule.ParamItemModel;
+import io.xnc.plugins.android_act_launcher.rule.Rule;
 import org.apache.http.util.TextUtils;
 import org.jetbrains.android.util.AndroidBundle;
 import org.jetbrains.android.util.AndroidUtils;

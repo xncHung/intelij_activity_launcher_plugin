@@ -17,11 +17,13 @@ import java.util.*;
 @State(name = "ActivityLauncherRules",
         storages = {@Storage("ActivityLauncherRules.xml")})
 public class RuleConfigService implements PersistentStateComponent<Element> {
+    private static final String VALUE = "value";
     public List<Rule> rules = new ArrayList<>();
     public boolean clearData;
     public String selectedDeviceId = "";
     public String selectedModule = "";
     public HashMap<String, String> selectedProductVariantMap = new HashMap<>();
+    public boolean stopApp;
 
     @Nullable
     @Override
@@ -29,6 +31,7 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
         Element config = new Element("config");
 
         addField2Config(config, "clearData", String.valueOf(clearData));
+        addField2Config(config, "stopApp", String.valueOf(stopApp));
         addField2Config(config, "selectedDeviceId", selectedDeviceId);
         addField2Config(config, "selectedModule", selectedModule);
 
@@ -45,7 +48,7 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
         return config;
     }
 
-    private void addMap2Config(Element config, String name, Map<String, String> map) {
+    private void addMap2Config(Element config, String name, @NotNull Map<String, String> map) {
         Element element = new Element("option");
         element.setAttribute("name", name);
         Element mapElement = new Element("map");
@@ -56,17 +59,17 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
         config.addContent(element);
     }
 
-    private void addEntry2Map(Element config, Map.Entry<String, String> entry) {
+    private void addEntry2Map(@NotNull Element config, @NotNull Map.Entry<String, String> entry) {
         Element element = new Element("entry");
         element.setAttribute("key", entry.getKey());
-        element.setAttribute("value", entry.getValue());
+        element.setAttribute(VALUE, entry.getValue());
         config.addContent(element);
     }
 
-    private void addField2Config(Element config, String name, String value) {
+    private void addField2Config(@NotNull Element config, String name, String value) {
         Element element = new Element("option");
         element.setAttribute("name", name);
-        element.setAttribute("value", value);
+        element.setAttribute(VALUE, value);
         config.addContent(element);
     }
 
@@ -78,19 +81,27 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
             Attribute value;
             switch (name.getValue()) {
                 case "clearData":
-                    value = item.getAttribute("value");
+                    value = item.getAttribute(VALUE);
                     try {
                         clearData = value.getBooleanValue();
                     } catch (DataConversionException e) {
                         clearData = false;
                     }
                     break;
+                case "stopApp":
+                    value = item.getAttribute(VALUE);
+                    try {
+                        stopApp = value.getBooleanValue();
+                    } catch (DataConversionException e) {
+                        stopApp = false;
+                    }
+                    break;
                 case "selectedDeviceId":
-                    value = item.getAttribute("value");
+                    value = item.getAttribute(VALUE);
                     selectedDeviceId = value.getValue();
                     break;
                 case "selectedModule":
-                    value = item.getAttribute("value");
+                    value = item.getAttribute(VALUE);
                     selectedModule = value.getValue();
                     break;
                 case "rules":
@@ -104,7 +115,7 @@ public class RuleConfigService implements PersistentStateComponent<Element> {
                     Element map = item.getChild("map");
                     List<Element> entrys = map.getChildren("entry");
                     for (Element element : entrys) {
-                        selectedProductVariantMap.put(element.getAttributeValue("key"), element.getAttributeValue("value"));
+                        selectedProductVariantMap.put(element.getAttributeValue("key"), element.getAttributeValue(VALUE));
                     }
                     break;
             }

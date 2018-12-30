@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ActivityLauncherRules">
     <option name="clearData" value="false" />
-    <option name="selectedDeviceId" value="192.168.56.101:5555" />
+    <option name="stopApp" value="false" />
+    <option name="selectedDeviceId" value="192.168.116.101:5555" />
     <option name="selectedModule" value="sample" />
-    <option name="selectedVariantMap">
+    <option name="selectedProductVariantMap">
       <map>
         <entry key="sample" value="betaDebug" />
       </map>
@@ -28,7 +29,7 @@
                 <option name="key" value="testString" />
                 <option name="type" value="String or String array" />
                 <option name="realType" value="PrimitiveOrString" />
-                <option name="value" value="I'm a test String!" />
+                <option name="value" value="I'm a test String汉字!" />
               </IntentParam>
               <IntentParam>
                 <option name="isActive" value="true" />

@@ -2,10 +2,10 @@ package io.xnc.plugins.android_act_launcher.rule;
 
 import javax.swing.table.DefaultTableModel;
 
-class ParamItemModel extends DefaultTableModel {
+public class ParamItemModel extends DefaultTableModel {
 
 
-    ParamItemModel() {
+    public ParamItemModel() {
         super(IntentParam.COLUMN_NAMES, 0);
     }
 

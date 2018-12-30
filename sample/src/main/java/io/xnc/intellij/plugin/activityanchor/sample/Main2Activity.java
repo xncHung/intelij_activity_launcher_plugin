@@ -1,5 +1,6 @@
 package io.xnc.intellij.plugin.activityanchor.sample;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,7 +44,7 @@ public class Main2Activity extends AppCompatActivity {
 
         String[] testStrArray = getIntent().getStringArrayExtra("testStrArray");
         Log.d(TAG, "testStrArray: " + Arrays.toString(testStrArray));
-        map.put("testStrArray", testStrArray);
+        map.put("testStrArray", Arrays.toString(testStrArray));
 
         TestSeri testSeri = (TestSeri) getIntent().getSerializableExtra("testSeri");
         Log.d(TAG, "testSeri: " + testSeri);
@@ -78,5 +79,11 @@ public class Main2Activity extends AppCompatActivity {
         };
         lv.setAdapter(adapter);
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent: ");
     }
 }

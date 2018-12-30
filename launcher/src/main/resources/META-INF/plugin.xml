@@ -22,7 +22,20 @@
         configure the activity route that you want launch.Enjoy your debugging!
     </li>
 </ul>
-    ]]></description>
+    ]]></description><![CDATA[
+     <b>1.1.0</b>
+        <ul>
+            <li>Now Support double click to launch a item</li>
+            <li>Now stop app is not necessary but optional before launch</li>
+            <li>Now it's not necessary to refresh when the devices had changed </li>
+            <li>BUG_FIX: Fix Messy Display when the host's default charset is not utf-8</li>
+        </ul>
+    ]]>
+
+    <change-notes>
+
+
+    </change-notes>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ActivityLauncher"
                     anchor="right"
