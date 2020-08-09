@@ -34,7 +34,7 @@ class DebugUtil {
             if (handler instanceof AndroidProcessHandler) {
                 Client handlerClient = ((AndroidProcessHandler) handler).getClient(client.getDevice());
                 if (handlerClient != null && handlerClient.getClientData().getPid() == pid) {
-                    ((AndroidProcessHandler) handler).setNoKill();
+                    ((AndroidProcessHandler) handler).killProcess();
                     handler.detachProcess();
                     handler.notifyTextAvailable("Disconnecting run session: because a new debug session will be attached...", ProcessOutputTypes.STDOUT);
                     break;

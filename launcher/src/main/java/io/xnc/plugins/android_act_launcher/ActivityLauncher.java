@@ -2,6 +2,8 @@ package io.xnc.plugins.android_act_launcher;
 
 import com.android.builder.model.BuildTypeContainer;
 import com.android.builder.model.Variant;
+import com.android.ide.common.gradle.model.IdeAndroidProject;
+import com.android.ide.common.gradle.model.IdeVariant;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.PopupMenuListenerAdapter;
 import io.xnc.plugins.android_act_launcher.adb.Bridge;
@@ -32,6 +34,8 @@ import javax.swing.event.PopupMenuEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class ActivityLauncher extends JPanel implements GradleSyncListener {
 
@@ -195,27 +199,32 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     private void refreshVariantBox(Module module) {
         AndroidModuleModel androidModuleModel = AndroidModuleModel.get(module);
         if (androidModuleModel != null) {
-            Collection<String> variantNames = androidModuleModel.getVariantNames();
             Vector<String> data = new Vector<>();
-            for (String name : variantNames) {
-                Variant variant = androidModuleModel.findVariantByName(name);
-                if (variant != null) {
-                    BuildTypeContainer buildTypeContainer = androidModuleModel.findBuildType(variant.getBuildType());
-                    if (buildTypeContainer != null
-                            && buildTypeContainer.getBuildType() != null
-                            && buildTypeContainer.getBuildType().isDebuggable()) {
-                        data.add(name);
-                    }
-                }
-            }
+            androidModuleModel.getAndroidProject().forEachVariant(ideVariant -> {
+                BuildTypeContainer buildType = androidModuleModel.findBuildType(ideVariant.getBuildType());
+                if (buildType != null && buildType.getBuildType().isDebuggable())
+                    data.add(ideVariant.getName());
+            });
             DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(data);
             variantBox.setModel(model);
-            String s = configService.selectedProductVariantMap.get(module.getName());
-            int indexOf = model.getIndexOf(s);
+            int indexOf;
+            String s = androidModuleModel.getSelectedVariant().getName();
+            if (StringUtil.isEmptyOrSpaces(s))
+                s = configService.selectedProductVariantMap.get(module.getName());
+            indexOf = model.getIndexOf(s);
             if (indexOf >= 0) {
                 variantBox.setSelectedIndex(indexOf);
             }
         }
+    }
+
+    private boolean isDebuggable(AndroidModuleModel androidModuleModel, String variant) {
+        return androidModuleModel.getBuildTypes().stream().anyMatch(s -> {
+            if (!variant.endsWith(StringUtil.capitalize(s)))
+                return false;
+            BuildTypeContainer buildType = androidModuleModel.findBuildType(s);
+            return buildType != null && buildType.getBuildType().isDebuggable();
+        });
     }
 
     private void refreshData() {
@@ -223,7 +232,7 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
         Vector<Module> apps = new Vector<>();
         for (Module module : modules) {
             AndroidModuleModel androidModuleModel = AndroidModuleModel.get(module);
-            if (androidModuleModel != null && androidModuleModel.getAndroidProject().getProjectType() == AndroidProject.PROJECT_TYPE_APP) {
+            if (androidModuleModel != null && androidModuleModel.getAndroidProject().getProjectType() == IdeAndroidProject.PROJECT_TYPE_APP) {
                 apps.add(module);
             }
         }
@@ -318,7 +327,6 @@ public class ActivityLauncher extends JPanel implements GradleSyncListener {
     }
 
 
-    @Override
     public void syncStarted(@NotNull Project project, boolean b, boolean b1) {
 
     }

@@ -2,16 +2,24 @@
 <project version="4">
   <component name="ActivityLauncherRules">
     <option name="clearData" value="false" />
-    <option name="stopApp" value="false" />
-    <option name="selectedDeviceId" value="192.168.116.101:5555" />
-    <option name="selectedModule" value="sample" />
+    <option name="stopApp" value="true" />
+    <option name="selectedDeviceId" value="192.168.166.102:5555" />
+    <option name="selectedModule" value="android_launcher.sample" />
     <option name="selectedProductVariantMap">
       <map>
+        <entry key="android_launcher.sample" value="betaDebug" />
         <entry key="sample" value="betaDebug" />
       </map>
     </option>
     <option name="rules">
       <list>
+        <Rule>
+          <option name="name" value="fsdf" />
+          <option name="target" value="io.xnc.intellij.plugin.activityanchor.sample.Main2Activity" />
+          <option name="params">
+            <list />
+          </option>
+        </Rule>
         <Rule>
           <option name="name" value="test" />
           <option name="target" value="io.xnc.intellij.plugin.activityanchor.sample.MainActivity" />
@@ -36,7 +44,7 @@
                 <option name="key" value="testInt" />
                 <option name="type" value="int or int array" />
                 <option name="realType" value="PrimitiveOrString" />
-                <option name="value" value="19" />
+                <option name="value" value="12" />
               </IntentParam>
               <IntentParam>
                 <option name="isActive" value="true" />

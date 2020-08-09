@@ -1,6 +1,7 @@
 package io.xnc.plugins.android_act_launcher.ui;
 
 import android.os.Parcelable;
+import com.intellij.psi.JavaPsiFacade;
 import io.xnc.plugins.android_act_launcher.ActivityLauncher;
 import com.android.tools.idea.run.activity.ActivityLocatorUtils;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
@@ -14,7 +15,6 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;

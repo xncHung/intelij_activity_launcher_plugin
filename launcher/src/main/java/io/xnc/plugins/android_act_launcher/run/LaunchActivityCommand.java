@@ -2,6 +2,7 @@ package io.xnc.plugins.android_act_launcher.run;
 
 import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.Variant;
+import com.android.tools.idea.gradle.util.GradleUtil;
 import io.xnc.plugins.android_act_launcher.rule.Rule;
 import com.android.ddmlib.IDevice;
 import com.android.tools.idea.gradle.project.model.AndroidModuleModel;
@@ -9,6 +10,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static io.xnc.plugins.android_act_launcher.util.NotificationUtil.*;
 
@@ -37,6 +39,12 @@ public class LaunchActivityCommand implements Command {
             error("can't connect Device");
             return false;
         }
+        model.getAllApplicationIds().forEach(new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                error("error Variant"+s);
+            }
+        });
         Variant variant = model.findVariantByName(variantName);
         if (variant == null || variant.getMainArtifact() == null) {
             error("error Variant");
